@@ -1,0 +1,52 @@
+@prefix chord: <http://purl.org/ontology/chord/> .
+@prefix dbo:   <http://dbpedia.org/property/> .
+@prefix ex:    <http://example.org/bwv244/> .
+@prefix mode:  <http://purl.org/ontology/tonality/mode/> .
+@prefix mso:   <http://linkeddata.uni-muenster.de/ontology/musicscore#> .
+@prefix note:  <http://purl.org/ontology/chord/note/> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix ton:   <http://purl.org/ontology/tonality/> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+ex:WEBERN_MOV1_P1_STAFF_1
+        a             mso:Staff ;
+        rdfs:label    "1" ;
+        mso:hasVoice  ex:WEBERN_MOV1_P1_VOICE_1 .
+
+ex:WEBERN_MOV1_P1_VOICE_1
+        a               mso:Voice ;
+        rdfs:label      "1" ;
+        mso:hasNoteSet  ex:WEBERN_MOV1_P1_M1_ST1_V1_NOTESET_1 .
+
+ex:WEBERN_MOV1_P1_M1_ST1_V1_NOTESET_1
+        a                mso:NoteSet ;
+        mso:hasClef      ex:WEBERN_MOV1_P1_M1_NS_1_CLEF ;
+        mso:hasDuration  ex:WEBERN_MOV1_P1_M1_NS1_DURATION ;
+        mso:hasNote      ex:WEBERN_MOV1_P1_M1_NS_1_NOTE_0 .
+
+ex:WEBERN_MOV1_P1_M1_NS1_DURATION
+        a       mso:Quarter .
+
+ex:WEBERN_MOV1_P1_M1_NS_1_NOTE_0
+        a              chord:Note ;
+        mso:hasOctave  "3"^^xsd:int ;
+        chord:natural  note:D .
+
+note:D  a       chord:Natural .
+
+ex:WEBERN_MOV1_P1_M1_KEY
+        a          ton:Key ;
+        ton:mode   mode:minor ;
+        ton:tonic  note:B .
+
+ex:WEBERN_MOV1_P1_M1_TIME
+        a                mso:TimeSignature ;
+        mso:hasBeatType  "4"^^xsd:int ;
+        mso:hasBeats     "4"^^xsd:int .
+
+ex:WEBERN_MOV1_P1_M1
+        a               mso:Measure ;
+        dbo:order       "1" ;
+        mso:hasKey      ex:WEBERN_MOV1_P1_M1_KEY ;
+        mso:hasNoteSet  ex:WEBERN_MOV1_P1_M1_ST1_V1_NOTESET_1 ;
+        mso:hasTime     ex:WEBERN_MOV1_P1_M1_TIME .

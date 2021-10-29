@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="https://music-encoding.org/schema/4.0.0/mei-cmn.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="https://music-encoding.org/schema/4.0.0/mei-cmn.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="4.0.0">
+   <meiHead>
+      <fileDesc>
+         <titleStmt>
+            <title>Passacaglia <titlePart type="subordinate">op. 1 (1908)</titlePart>
+               <titlePart type="subordinate">an electronic transcription</titlePart>
+            </title>
+            <composer>
+               <persName role="creator" auth.uri="http://d-nb.info/gnd/" auth="GND" codedval="118629786">Anton Webern</persName>
+            </composer>
+            <respStmt>
+               <persName role="encoder">Stefan Münnich</persName>
+            </respStmt>
+         </titleStmt>
+         <pubStmt>
+         </pubStmt>
+      </fileDesc>
+   </meiHead>
+   <music>
+      <body>
+         <mdiv xml:id="mdiv-0000000661055756">
+            <score xml:id="score-0000000082448546">
+               <scoreDef xml:id="scoredef-0000000264613590" mm="160" meter.count="2" meter.unit="4" key.sig="1f">
+                  <staffGrp xml:id="staffgrp-0000000239381110">
+                     <staffDef xml:id="staffdef-0000001200901935" n="1" lines="5" clef.shape="F" clef.line="4" />
+                  </staffGrp>
+               </scoreDef>
+               <section xml:id="section-0000000195135968">
+                  <measure xml:id="m1" n="1">
+                     <staff xml:id="staff-0000000268858337" n="1">
+                        <layer xml:id="layer-0000000530264114" n="1">
+                           <note xml:id="m1_s1_e1" dur="4" oct="3" pname="d" />
+                           <rest xml:id="rest-0000000985315630" dur="4" />
+                        </layer>
+                     </staff>
+                     <dynam tstamp="1" staff="1" place="below">ppp</dynam>
+                  </measure>
+                  <measure xml:id="m2" n="2">
+                     <staff xml:id="staff-0000001475141758" n="1">
+                        <layer xml:id="layer-0000000907729032" n="1">
+                           <note xml:id="note-0000001578309063" dur="4" oct="3" pname="c" accid="s" />
+                           <rest xml:id="rest-0000000092625705" dur="4" />
+                        </layer>
+                     </staff>
+                  </measure>
+                  <measure xml:id="m3" n="3">
+                     <staff xml:id="staff-0000000426976355" n="1">
+                        <layer xml:id="layer-0000000666516987" n="1">
+                           <note xml:id="m3_s1_e2" dur="4" oct="3" pname="b" />
+                           <rest xml:id="rest-0000001948093945" dur="4" />
+                        </layer>
+                     </staff>
+                  </measure>
+                  <measure xml:id="m4" n="4">
+                     <staff xml:id="staff-0000000188363639" n="1">
+                        <layer xml:id="layer-0000000266352791" n="1">
+                           <note xml:id="m4_s1_e3" dur="4" oct="3" pname="a" accid="f" />
+                           <rest xml:id="rest-0000001500480442" dur="4" />
+                        </layer>
+                     </staff>
+                  </measure>
+                  <measure xml:id="m5" n="5">
+                     <staff xml:id="staff-0000000694617309" n="1">
+                        <layer xml:id="layer-0000000600412257" n="1">
+                           <note xml:id="m5_s1_e1" dur="4" oct="3" pname="f" />
+                           <rest xml:id="rest-0000002125347267" dur="4" />
+                        </layer>
+                     </staff>
+                  </measure>
+                  <measure xml:id="m6" n="6">
+                     <staff xml:id="staff-0000000694617306" n="1">
+                        <layer xml:id="layer-0000000600412256" n="1">
+                           <note xml:id="m6_s1_e1" dur="4" oct="3" pname="e" />
+                           <rest xml:id="rest-0000002125347266" dur="4" />
+                        </layer>
+                     </staff>
+                  </measure>
+                  <measure xml:id="m7" n="7">
+                     <staff xml:id="staff-0000000694617377" n="1">
+                        <layer xml:id="layer-0000000600412277" n="1">
+                           <note xml:id="m7_s1_e1" dur="4" oct="3" pname="a" />
+                           <rest xml:id="rest-0000002125347277" dur="4" />
+                        </layer>
+                     </staff>
+                  </measure>
+                  <measure xml:id="m8" n="8">
+                     <staff xml:id="staff-0000000694617308" n="1">
+                        <layer xml:id="layer-0000000600412258" n="1">
+                           <note xml:id="m8_s1_e1" dur="4" oct="3" pname="d" />
+                           <rest xml:id="rest-0000002125347268" dur="4" />
+                        </layer>
+                     </staff>
+                  </measure>
+               </section>
+            </score>
+         </mdiv>
+      </body>
+   </music>
+</mei>
