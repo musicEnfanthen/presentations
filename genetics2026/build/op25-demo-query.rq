@@ -1,0 +1,11 @@
+# Op. 25 demo: edition complexes, part positions, main sketches and the row table only.
+# Paste into the SPARQL editor of the graph view (edition/complex/op25/graph).
+PREFIX awg: <https://edition.anton-webern.ch/webern-onto#>
+PREFIX dcterms: <http://purl.org/dc/terms/>
+CONSTRUCT { ?a ?p ?b } WHERE {
+  ?a ?p ?b .
+  FILTER(?p = awg:precedes || ?p = awg:precedesScripture || ?p = awg:precedesContent
+      || ?p = awg:concomitates || ?p = dcterms:hasPart || ?p = awg:belongsToComplex)
+  FILTER(regex(str(?a), "#(Op25(_SkRT|_part_[0-9]+)?|M3[0-9][0-9](_Sk[0-9]+)?)$")
+      && regex(str(?b), "#(Op25(_SkRT|_part_[0-9]+)?|M3[0-9][0-9](_Sk[0-9]+)?)$"))
+}
