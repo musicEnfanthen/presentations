@@ -41,7 +41,7 @@ OUT = (
 )
 
 DECK_FOOTER = "Compositional Processes as Graph · AWG"
-SPEAKER = "Stefan Münnich"
+SPEAKER = "Dr. Stefan Münnich"
 EDITION_URL = "https://edition.anton-webern.ch"
 EMAIL = "stefan.muennich@unibas.ch"
 
@@ -509,12 +509,13 @@ def fmt_time(sec):
 
 
 ELAPSED = [0]
+TOTAL = 25 * 60  # the full 25 minutes slot, no reserve
 
 
 def notes(slide, label, seconds, text):
     ELAPSED[0] += seconds
     slide.notes_slide.notes_text_frame.text = (
-        f"[{label}] Target time: {fmt_time(seconds)} (cumulative {fmt_time(ELAPSED[0])} of 20:00)\n\n"
+        f"[{label}] Target time: {fmt_time(seconds)} (cumulative {fmt_time(ELAPSED[0])} of {fmt_time(TOTAL)})\n\n"
         + text.strip()
     )
 
@@ -569,7 +570,7 @@ def slide_01():
         ],
         [
             f"{SPEAKER} · Anton Webern Gesamtausgabe, University of Basel",
-            "Comparative Perspectives on Genetic Criticism in Music",
+            "“Comparative Perspectives on Genetic Criticism in Music”",
             "International Conference of the IMS Study Group",
             "Rome, German Historical Institute, 16–18 November 2026",
         ],
@@ -668,7 +669,7 @@ CUR_EDGES = [("a", "b", "arrow"), ("b", "c", "arrow"), ("b", "d", "dash")]
 
 def slide_03():
     s = content_slide(
-        "The AWG graph separates what the data imply from what editors assert",
+        "The AWG graph combines generated data with curated editorial assertions",
         "The AWG and its graph",
         watermark=False,
     )
@@ -765,7 +766,7 @@ def slide_03():
         "The AWG and its graph",
         45,
         """
-The AWG is a hybrid edition, in print and online. Online, it provides an RDF graph as a semantic view of its materials.
+Online, the AWG also provides an RDF graph as a semantic view of these materials.
 
 The graph has two layers. The generated layer is derived from the edition's structured data: hierarchy, sources, folios, placements, and relations that follow from the numbering. The curated layer holds what only editors can assert: continuity drafts, evidence-based order, and uncertainty.
 
@@ -774,97 +775,144 @@ Both are described by one draft ontology, version 0.1. You can query it with SPA
     )
 
 
-def slide_04():
-    s = content_slide(
-        "In op. 25, the layers show where editorial judgment begins",
-        "Live demo: op. 25",
-        watermark=False,
-    )
-    # Canvas captures at DPR 3 (Chrome "Capture node screenshot").
-    # (file, step, caption, crop box, red marks as (cx, cy, rx, ry)),
-    # crop box and marks in pixels of the original capture.
-    panels = [
-        (
-            "op25-graph-generated-canvas.png",
-            "generated",
-            "three islands, one per song",
-            (66, 249, 3426, 2251),
-            [(2224, 1175, 287, 81)],
-        ),  # Op25_SkRT without genetic relations
-        (
-            "op25-graph-curated-canvas.png",
-            "curated",
-            "one chain across the songs",
-            (128, 115, 3327, 2478),
-            [(803, 1358, 143, 126), (1813, 848, 161, 99)],
-        ),  # M317 Sk4 → M321 Sk1, M321 Sk9 → M322 Sk1
-        (
-            "op25-graph-both-canvas.png",
-            "both",
-            "the chain crosses the opus order",
-            (261, 161, 2845, 2567),  # bottom edge cuts off the app toolbar
-            [(1264, 1309, 165, 90)],
-        ),  # M321 Sk9 → M322 Sk1
-    ]
+# Graph view of op. 25 in three steps, one slide each (no live demo).
+# Canvas captures at DPR 3 (Chrome "Capture node screenshot").
+# (file, step, caption, crop box, red marks as (cx, cy, rx, ry, angle)),
+# crop box and marks in pixels of the original capture; a mark on an edge is
+# an ellipse along it (angle in degrees, clockwise) that encloses both nodes.
+OP25_PANELS = [
+    (
+        "op25-graph-generated-canvas.png",
+        "generated",
+        "three “islands”, one per song",
+        (66, 249, 3426, 2251),
+        [(2228, 1175, 284, 81, 0)],
+    ),  # Op25_SkRT without genetic relations
+    (
+        "op25-graph-curated-canvas.png",
+        "curated",
+        "one chain across the songs",
+        (128, 115, 3327, 2478),
+        [(803, 1358, 322, 75, 48.8), (1813, 849, 320, 75, -33.2)],
+    ),  # M317 Sk4 → M321 Sk1, M321 Sk9 → M322 Sk1
+    (
+        "op25-graph-both-canvas.png",
+        "both",
+        "the chain crosses the opus order",
+        (261, 161, 2845, 2567),  # bottom edge cuts off the app toolbar
+        [(1266, 1307, 442, 75, -21.0)],
+    ),  # M321 Sk9 → M322 Sk1
+]
+OP25_TITLES = [
+    "Generated from the edition data alone, op. 25 falls into three “islands”",
+    "The curated layer links the three songs in one chain",
+    "The combined layers show where editorial judgment becomes explicit",
+]
+OP25_NOTES = [
+    (
+        30,
+        """
+This is the graph of op. 25, filtered to the edition complexes and the main sketches. In the AWG, op. 25 is a composite edition complex: M 317, M 322 and M 321, in the order of the opus.
+
+First, the generated layer: what follows from the edition data alone. Three “islands”, one per song, ordered by numbering. The row table is there [red mark], but without any genetic relation.
+
+ALT TEXT: Screenshot of the graph view of op. 25, generated layer: three separate clusters of nodes, one per song; a red ellipse marks the row table node without genetic relations. Beside it, the three steps, step 1 highlighted: generated – three “islands”, one per song.
+""",
+    ),
+    (
+        20,
+        """
+Second, the curated layer: the editors' assertions. Look at the chain [red marks]: M 317, then M 321, then M 322. Webern sketched the third song before the second – together with the row table.
+
+ALT TEXT: Screenshot of the graph view of op. 25, curated layer: one connected chain; red ellipses mark the links from M 317 Sk4 to M 321 Sk1 and from M 321 Sk9 to M 322 Sk1. Beside it, the three steps, step 2 highlighted: curated – one chain across the songs.
+""",
+    ),
+    (
+        25,
+        """
+Third, both layers together. The chain cuts across the opus order [red mark]. That is where editorial judgment becomes explicit – and the laboratory for the rest of this talk.
+
+(The screenshots come from the app's graph view, filtered with the SPARQL query in build/op25-demo-query.rq.)
+
+ALT TEXT: Screenshot of the graph view of op. 25, both layers; a red ellipse marks the link from M 321 Sk9 to M 322 Sk1, against the opus order. Beside it, the three steps, step 3 highlighted: both – the chain crosses the opus order.
+""",
+    ),
+]
+
+
+def op25_slide(idx):
+    file, step, caption, crop, marks = OP25_PANELS[idx]
+    s = content_slide(OP25_TITLES[idx], "Graph view: op. 25", watermark=False)
     from PIL import Image
 
     img_dir = tempfile.mkdtemp(prefix="awg_img_")
-    x0, y0, gap, pw, ph = 0.93, 4.3, 0.5, (32.0 - 2 * 0.5) / 3, 8.9
-    for i, (file, step, caption, crop, marks) in enumerate(panels):
-        x = x0 + i * (pw + gap)
-        with Image.open(os.path.join(HERE, "img", file)) as im:
-            im = im.convert("RGB").crop(crop)
-            f = min(1.0, 2400 / max(im.size))  # at most 2400 px, about 590 dpi
-            im = im.resize((round(im.width * f), round(im.height * f)), Image.LANCZOS)
-            path = os.path.join(img_dir, file)
-            im.save(path, optimize=True)
-            iw, ih = im.size
-        marks = [
-            ((cx - crop[0]) * f, (cy - crop[1]) * f, rx * f, ry * f)
-            for cx, cy, rx, ry in marks
-        ]
-        k = min(pw / iw, ph / ih)  # cm per pixel
-        w, h = iw * k, ih * k
-        ix, iy = x + (pw - w) / 2, y0 + (ph - h) / 2
-        pic = s.shapes.add_picture(path, Cm(ix), Cm(iy), Cm(w), Cm(h))
-        pic.name = f"Screenshot: {step}"
-        pic._element.nvPicPr.cNvPr.set(
-            "descr", f"Graph view of op. 25, {step} layer, filtered by SPARQL"
+    x0, y0, pw, ph = 0.93, 4.3, 21.6, 11.4
+    sx = x0 + pw + 0.8  # steps column, same position on all three slides
+    with Image.open(os.path.join(HERE, "img", file)) as im:
+        im = im.convert("RGB").crop(crop)
+        f = min(1.0, 2400 / max(im.size))  # at most 2400 px
+        im = im.resize((round(im.width * f), round(im.height * f)), Image.LANCZOS)
+        path = os.path.join(img_dir, file)
+        im.save(path, optimize=True)
+        iw, ih = im.size
+    marks = [
+        ((cx - crop[0]) * f, (cy - crop[1]) * f, rx * f, ry * f, a)
+        for cx, cy, rx, ry, a in marks
+    ]
+    k = min(pw / iw, ph / ih)  # cm per pixel
+    w, h = iw * k, ih * k
+    ix, iy = x0 + (pw - w) / 2, y0 + (ph - h) / 2  # centred in its area
+    pic = s.shapes.add_picture(path, Cm(ix), Cm(iy), Cm(w), Cm(h))
+    pic.name = f"Screenshot: {step}"
+    pic._element.nvPicPr.cNvPr.set(
+        "descr", f"Graph view of op. 25, {step} layer, filtered by SPARQL"
+    )
+    shutil.rmtree(img_dir, ignore_errors=True)  # the picture is embedded by now
+    frame = s.shapes.add_shape(MSO_SHAPE.RECTANGLE, Cm(ix), Cm(iy), Cm(w), Cm(h))
+    frame.name = f"Frame: {step}"
+    frame.fill.background()
+    frame.line.color.theme_color = T_MINT
+    frame.line.width = Pt(1)
+    drop_styles(frame._element)
+    for cx, cy, rx, ry, a in marks:
+        m = s.shapes.add_shape(
+            MSO_SHAPE.OVAL,
+            Cm(ix + (cx - rx) * k),
+            Cm(iy + (cy - ry) * k),
+            Cm(2 * rx * k),
+            Cm(2 * ry * k),
         )
-        frame = s.shapes.add_shape(MSO_SHAPE.RECTANGLE, Cm(x), Cm(y0), Cm(pw), Cm(ph))
-        frame.name = f"Panel frame: {step}"
-        frame.fill.background()
-        frame.line.color.theme_color = T_MINT
-        frame.line.width = Pt(1)
-        drop_styles(frame._element)
-        for cx, cy, rx, ry in marks:
-            m = s.shapes.add_shape(
-                MSO_SHAPE.OVAL,
-                Cm(ix + (cx - rx) * k),
-                Cm(iy + (cy - ry) * k),
-                Cm(2 * rx * k),
-                Cm(2 * ry * k),
+        m.rotation = a
+        m.name = f"Mark: {step}"
+        m.fill.background()
+        m.line.color.theme_color = T_RED
+        m.line.width = Pt(2.25)
+        drop_styles(m._element)
+
+    # the three steps beside the screenshot; the current one highlighted
+    sw = 32.93 - sx
+    for j, (_, st, cap, _, _) in enumerate(OP25_PANELS):
+        sy = y0 + j * 3.1
+        if j == idx:
+            rect(
+                s,
+                sx - 0.4,
+                sy - 0.25,
+                sw + 0.4,
+                2.8,
+                f"Current step: {st}",
+                fill=T_MINT,
+                brightness=0.6,
             )
-            m.name = f"Mark: {step}"
-            m.fill.background()
-            m.line.color.theme_color = T_RED
-            m.line.width = Pt(2.25)
-            drop_styles(m._element)
-        add_text(
-            s,
-            x,
-            y0 + ph + 0.35,
-            pw,
-            1.6,
-            [[("sub", f"{i + 1}  "), ("bold", step)], ("body", caption)],
-            f"Step {i + 1}: {step}",
-        )
-    shutil.rmtree(img_dir, ignore_errors=True)  # pictures are embedded by now
+            paras = [[("sub", f"{j + 1}  "), ("bold", st)], ("body", cap)]
+        else:
+            paras = [[("caption", f"{j + 1}  {st}")], ("caption", cap)]
+        add_text(s, sx, sy, sw - 0.3, 1.9, paras, f"Step {j + 1}: {st}")
 
     add_text(
         s,
         x0,
-        16.45,
+        16.1,
         32.0,
         0.6,
         [
@@ -876,27 +924,20 @@ def slide_04():
         ],
         "Source line",
     )
-    notes(
-        s,
-        "Live demo: op. 25",
-        75,
-        """
-DEMO SCRIPT (before the talk: open the graph view of op. 25, paste the query from build/op25-demo-query.rq into the SPARQL editor, zoom about 125 %)
+    seconds, text = OP25_NOTES[idx]
+    notes(s, f"Graph view: op. 25 ({idx + 1}/3)", seconds, text)
 
-This is the graph of op. 25, filtered to the edition complexes and the main sketches. In the AWG, op. 25 is a composite edition complex: M 317, M 322 and M 321, in the order of the opus.
 
-Step 1 – generated: This is what follows from the edition data alone. Three islands, one per song, ordered by numbering. The row table is there, but without any genetic relation.
+def slide_04_generated():
+    op25_slide(0)
 
-Step 2 – curated: These are the editors' assertions. Look at the chain: M 317, then M 321, then M 322. Webern sketched the third song before the second – together with the row table.
 
-Step 3 – both: Together, the chain cuts across the opus order. That is where editorial judgment begins – and the laboratory for the rest of this talk.
+def slide_04_curated():
+    op25_slide(1)
 
-FALLBACK (if the live demo fails)
-- Do not troubleshoot on stage. Say: "Let me show you the same thing as screenshots."
-- Walk through the three panels on this slide with the same three steps.
-- Before the talk: open the tab with the query, test the venue network, keep this deck locally.
-""",
-    )
+
+def slide_04_both():
+    op25_slide(2)
 
 
 def slide_05():
@@ -995,7 +1036,7 @@ Where do the terms of the model come from? Not from a theory of genetic criticis
 
 A sketch is what the editors number in the source description: Sketch 1, Sketch 2, and Sketch 2.1 for a sub-sketch. A version – in German "Textfassung" – is a recognisable state of a song, numbered TF1, TF2. Paratexts are everything on the page that accompanies the music: title, dating, pagination, instrument indications – again the categories of the source descriptions. The row table is Webern's own sheet with the forms of the twelve-tone row; in op. 25 it is a source of its own. And the edition complex is the unit the AWG edits together, named after an opus or an M number from Moldenhauer's catalogue.
 
-Op. 25 shows how these units nest: one composite complex with three parts, M 317, M 322 and M 321, in the order of the opus. As the demo showed, the sketches follow another order.
+Op. 25 shows how these units nest: one composite complex with three parts, M 317, M 322 and M 321, in the order of the opus. As the graph view showed, the sketches follow another order.
 
 ALT TEXT: Five cards in a row – sketch, version, paratext, row table, edition complex – each with its German term and one line on where it comes from in the documents. Below, a strip: op. 25 equals M 317, M 322, M 321, songs I to III.
 """,
@@ -1031,28 +1072,6 @@ def slide_06():
         brightness=0.6,
     )
     tree(s, 3.43, y0 + 4.4 + bh, [2.73, 8.0], y0 + 7.8, "Tree: Sketch")
-    # TextVersion beside the hierarchy
-    labelled_box(
-        s,
-        13.4,
-        y0 + 1.0,
-        5.4,
-        bh,
-        "TextVersion",
-        "TextVersion",
-        line=T_DARKGREEN,
-        line_pt=1.25,
-        dash=True,
-    )
-    add_text(
-        s,
-        13.4,
-        y0 + 1.0 + bh + 0.25,
-        6.6,
-        1.2,
-        [("caption", "abstract, not the edited sheet")],
-        "Caption: TextVersion",
-    )
 
     # uncertainty: a tag on a statement
     rx = 20.9
@@ -1141,17 +1160,220 @@ def slide_06():
     notes(
         s,
         "From term to class",
-        75,
+        60,
         """
-The next step turns these terms into classes. The superclass is Inscription: everything written on a document that we place in a genetic order. Sketch and Paratext are its subclasses – so a dating can stand in a genetic chain just like a sketch. Under Sketch there are two more specific classes: the row table and the continuity draft.
-
-Beside this hierarchy stands TextVersion. It is abstract: not the edited sheet you see in the app, but the state of a song that sources transmit and editions edit.
+The next step turns these terms into classes. The superclass is Inscription: everything written on a document that we place in a genetic order. Sketch and Paratext are its subclasses – so a dating can stand in a genetic chain just like a sketch. Under Sketch there are two more specific classes: the row table and the continuity draft. The three forms of edition become classes as well, under EditedMusicText, each linked by "edits" to a TextVersion or a Sketch.
 
 Uncertainty is not a relation of its own. An earlier draft had a relation "concomitates unsure". Now an editorial statement carries a small tag: certainty uncertain. Without the tag, the statement counts as certain.
 
 And some terms of the edition have no class yet: "study composition" and "ink draft".
 
-ALT TEXT: Class diagram. Inscription is the superclass of Sketch and Paratext; Sketch has the subclasses RowTable and ContinuityDraft. Beside it, a dashed box TextVersion, labelled "abstract, not the edited sheet". On the right, a statement "A precedes B" in a dashed frame, with a red tag "certainty: uncertain" hanging from it. Footnote: study composition and ink draft are not modelled yet.
+ALT TEXT: Class diagram. Inscription is the superclass of Sketch and Paratext; Sketch has the subclasses RowTable and ContinuityDraft. On the right, a statement "A precedes B" in a dashed frame, with a red tag "certainty: uncertain" hanging from it. Footnote: study composition and ink draft are not modelled yet.
+""",
+    )
+
+
+def slide_02_editions():
+    # wording after the AWG preface (en): work / text / sketch editions,
+    # versions of the musical text (Textfassungen), sketches
+    s = content_slide(
+        "The AWG distinguishes three forms of edition, by transmission and use",
+        "The Anton Webern Gesamtausgabe",
+        watermark=False,
+    )
+    cards = [  # (term, German term, what it presents)
+        (
+            "work editions",
+            "Werkeditionen",
+            "published or intended for print (op. 1–31)",
+        ),
+        ("text editions", "Texteditionen", "beyond a sketch, not concluded in print"),
+        (
+            "sketch editions",
+            "Skizzeneditionen",
+            "diplomatic transcriptions, mostly pencil",
+        ),
+    ]
+    x0, y0, gap, h = 0.93, 4.4, 1.0, 5.0
+    w = (32.0 - 2 * gap) / 3
+    xs = [x0 + i * (w + gap) for i in range(3)]
+    for x, (term, german, gloss) in zip(xs, cards):
+        rect(s, x, y0, w, h, f"Card: {term}", fill=T_MINT, brightness=0.6)
+        rect(s, x, y0, w, 0.18, f"Card bar: {term}", fill=T_MINT)
+        add_text(
+            s,
+            x + 0.5,
+            y0 + 0.6,
+            w - 1.0,
+            h - 1.0,
+            [("sub", term), ("code_caption", german), ("body", ""), ("body", gloss)],
+            f"Card text: {term}",
+        )
+
+    # what they edit: versions (work and text editions) and sketches
+    ty, th = y0 + h + 2.0, 1.9
+    targets = [
+        (xs[0], 2 * w + gap, "versions of the musical text", "Textfassungen", True),
+        (xs[2], w, "sketches", "Skizzen", False),
+    ]
+    for x, tw, term, german, dashed in targets:
+        if dashed:
+            rect(
+                s,
+                x,
+                ty,
+                tw,
+                th,
+                f"Target: {term}",
+                line=T_DARKGREEN,
+                line_pt=1.25,
+                dash=True,
+            )
+        else:
+            rect(s, x, ty, tw, th, f"Target: {term}", fill=T_MINT)
+        add_text(
+            s,
+            x,
+            ty,
+            tw,
+            th,
+            [("sub", term), ("code_caption", german)],
+            f"Target text: {term}",
+            align=PP_ALIGN.CENTER,
+            anchor=MSO_ANCHOR.MIDDLE,
+        )
+    for x, (term, _, _) in zip(xs, cards):
+        cx = x + w / 2
+        line(s, cx, y0 + h + 0.1, cx, ty - 0.1, f"Edge: edit ({term})", head=True)
+        add_text(
+            s,
+            cx + 0.25,
+            y0 + h + 0.7,
+            2.4,
+            0.5,
+            [("code_caption", "edit")],
+            f"Label: edit ({term})",
+        )
+    add_text(
+        s,
+        xs[0],
+        ty + th + 0.3,
+        2 * w + gap,
+        0.6,
+        [("caption", "a state of the musical text, attested by one or more sources")],
+        "Caption: versions",
+    )
+    notes(
+        s,
+        "The AWG and its editions",
+        60,
+        """
+First, a word on the edition itself. The AWG is a historical-critical complete edition of Webern's compositions, in print and online. It distinguishes three forms of edition – depending on how the sources have come down to us, and on what users need.
+
+Work editions present the versions that were published during Webern's lifetime or intended for publication: op. 1 to 31 and his arrangements. Text editions present versions that go beyond a sketch but were not concluded in print: compositional studies in ink, fragments, earlier versions of later works. Sketch editions present diplomatic transcriptions of the sketches, usually written in pencil.
+
+Work and text editions edit a version of the musical text – in German, a Textfassung. A version is not a document: it is a state of the musical text, attested by one or more sources. Sketch editions edit the sketches themselves.
+
+ALT TEXT: Three cards in a row: work editions (Werkeditionen) – published or intended for print, op. 1–31; text editions (Texteditionen) – beyond a sketch, not concluded in print; sketch editions (Skizzeneditionen) – diplomatic transcriptions, mostly pencil. Arrows labelled "edit" lead from the first two cards to a dashed box "versions of the musical text (Textfassungen)", captioned "a state of the musical text, attested by one or more sources", and from the third card to a box "sketches (Skizzen)".
+""",
+    )
+
+
+# Slide 19 of the talk #GraphSDE2019: Google Slides SVG export (page
+# g58b40a2515_0_19), rendered at 3x with headless Edge, white margin trimmed.
+M307_2019 = "graphsde2019-m307.png"
+
+
+def slide_09_m307():
+    s = content_slide(
+        "A process Webern kept reordering, and then dropped, becomes graspable",
+        "Exploring the graph: M 307",
+        watermark=False,
+    )
+    # Vorlage p. 12: picture 3/4, text 1/4
+    from PIL import Image
+
+    with Image.open(os.path.join(HERE, "img", M307_2019)) as im:
+        iw_px, ih_px = im.size
+    fx, fy, fh = 0.93, 4.4, 11.6
+    fw = fh * iw_px / ih_px
+    pic = s.shapes.add_picture(
+        os.path.join(HERE, "img", M307_2019), Cm(fx), Cm(fy), Cm(fw), Cm(fh)
+    )
+    pic.name = "Graph: M 307 (2019)"
+    pic._element.nvPicPr.cNvPr.set(
+        "descr",
+        "Hand-drawn genetic graph of M 307 from 2019: sketches Sk1 to Sk8 in four groups "
+        "(for 4 voices, row variants, for 3 voices, for 1 voice and piano), coloured by "
+        "folio (fol. 3v, 4v, 5r), linked by precedes arrows, concomitates double arrows "
+        "and dotted 'probably' lines; two datings, 7 July 1930 and 9 July 1930",
+    )
+    rect(s, fx, fy, fw, fh, "Frame: M 307 (2019)", line=T_MINT, line_pt=1.0)
+
+    tx = fx + fw + 0.8
+    tw = 32.93 - tx
+    add_text(
+        s,
+        tx,
+        fy,
+        tw,
+        fh,
+        [
+            ("sub", "the scoring shifts"),
+            (
+                "body",
+                "four voices, three voices, voice and piano – row variants in between",
+            ),
+            ("sub", "across the folios"),
+            (
+                "body",
+                "sketches of fol. 3v, 4v and 5r, ordered across the groups of scoring",
+            ),
+            ("sub", "for the editors"),
+            ("body", "a way into a process that Webern finally abandoned"),
+        ],
+        "Text: what the graph shows",
+        space_after=8,
+    )
+    add_text(
+        s,
+        tx,
+        fy + fh - 1.0,
+        tw,
+        1.0,
+        [("caption", "dotted: the same two relations, held as uncertain")],
+        "Caption: dotted lines",
+        anchor=MSO_ANCHOR.BOTTOM,
+    )
+    add_text(
+        s,
+        0.93,
+        16.45,
+        32.0,
+        0.6,
+        [
+            (
+                "caption",
+                "Source: Stefan Münnich/Thomas Ahrend, own graphic (2019): "
+                "sketch graph of M 307",
+            )
+        ],
+        "Source line",
+    )
+    notes(
+        s,
+        "Exploring the graph: M 307",
+        75,
+        """
+A second example, from an earlier stage of this work: M 307, from July 1930. Here the process is far less tidy than in op. 25.
+
+Webern starts for four voices [top band], tries out row variants [left], changes to three voices [middle], and ends with voice and piano [bottom right]. He keeps reordering – and in the end he abandons the piece.
+
+On paper, these sketches are spread over three folios, and their order is anything but obvious. As a graph, the process becomes something you can place: you see which sketch leads where, across the changes of scoring, and where the order stays open. The dotted lines are the same two relations, precedes and concomitates, held as uncertain.
+
+For us as editors, that was the point of drawing it: it made a process we could not yet describe in words graspable – and it showed us what a model would have to hold.
+
+ALT TEXT: Left, a genetic graph of M 307, drawn by hand in a slide program in 2019. Coloured boxes for the sketches Sk1 to Sk8 and their sub-sketches sit in four tinted groups: for 4 voices, row variants, for 3 voices, for 1 voice and piano. A legend gives box colours for fol. 3v, 4v and 5r, and three line types: concomitates (double arrow), precedes (arrow), probably (dotted). Two datings, 7. Juli [1930] and 9. VII[.] 1930. Right, three short points: the scoring shifts – four voices, three voices, voice and piano, row variants in between; across the folios – sketches of fol. 3v, 4v and 5r, ordered across the groups of scoring; for the editors – a way into a process that Webern finally abandoned. Below: dotted, the same two relations, held as uncertain.
 """,
     )
 
@@ -1314,193 +1536,321 @@ Two relations carry the genetic order.
 
 "precedes" marks an order that can be ascribed: the evidence shows that A was begun before B. It says nothing about the end – overlap is allowed. This is deliberate: Webern often went back to an earlier sketch while he was working on a later one. The relation is transitive.
 
-"concomitates" is a different kind of statement. The source shows that A and B were written side by side and shaped each other – a change in one is taken up in the other, and back again. Which of the two came first cannot be decided, and the relation does not pretend otherwise. So it records the mutual influence instead of inventing an order. That it is symmetric follows from this; it is not a claim about timing. And it is not transitive.
+"concomitates" is a different kind of statement. The source shows that A and B were written side by side and shaped each other – a change in one is taken up in the other, and back again. Which of the two came first cannot be decided, and the relation does not pretend otherwise. So it records the mutual influence instead of inventing an order. And it is a claim about timing as well: to shape each other, A and B must have been worked on in a common time range – they overlap. It is symmetric, and it is not transitive.
 
-For precedes, the model can also record the kind of evidence. precedesScripture rests on the writing: position on the page, overlay, writing instruments, layers of correction. precedesContent rests on the music: the later inscription takes over changes made in the earlier one. In op. 25, the editors assert precedesScripture between Sketches 1 and 2 of M 317, and precedesContent between Sketches 2 and 3. Plain precedes leaves the evidence open.
+For precedes, the model can also record the kind of evidence. precedesScripture rests on the writing: position on the page, overlay, writing instruments, layers of correction. precedesContent rests on the music: the later inscription takes over changes made in the earlier one. In op. 25, the editors assert precedesScripture between Sketches 1 and 2 of M 317 – you will see it later – and precedesContent between Sketches 2 and 3. Plain precedes leaves the evidence open.
 
-For those who know CIDOC CRM: precedes is close to P176, "starts before the start of". For concomitates, P174, "starts before the end of", captures the overlap – but not the influence, which is the point of the relation. So these are analogies, linked with seeAlso, not equivalences – more on that later.
+For those who know CIDOC CRM: precedes is close to P176, "starts before the start of". For concomitates, P174, "starts before the end of", captures the overlap in time – but not the influence, the other half of the relation. So these are analogies, linked with seeAlso, not equivalences – more on that next.
 
 ALT TEXT: Two timeline panels. Left, "precedes": bar A starts before bar B, the bars overlap; red dashed lines mark the two starts. Right, "concomitates": bar A lies within bar B, a red frame marks the overlap and a vertical red double arrow between the bars, labelled "mutual influence", shows that each shapes the other. Captions: precedes – an order can be shown, A begins before B, overlap allowed; concomitates – A and B influence each other, which came first cannot be decided. CRM analogies: P176, and P174 (the overlap, not the influence). Below, two labels: precedesScripture (page, overlay, writing instruments) and precedesContent (musical content).
 """,
     )
 
 
-def slide_08():
-    s = content_slide(
-        "The model makes explicit what editorial practice leaves implicit",
-        "Semantic shifts",
-        watermark=False,
+# Facsimile of sketchbook 3, fol. 38v with the editors' sketch boxes, from the
+# talk #AGE2020DLA (slide 3): raster embedded in its Google Slides SVG export,
+# taken in its own proportions (the slide had stretched it).
+M317_FACSIMILE = "m317-38v-facsimile.png"
+FACSIMILE_LEGEND = (
+    "Sketchbook 3, fol. 38v: sketches for op. 25/1 (M 317); markings by the AWG"
+)
+FACSIMILE_COPYRIGHT = "© Paul Sacher Stiftung, Basel, Sammlung Anton Webern"
+
+
+LAYOUT_FULL_PICTURE = prs.slide_layouts[9]  # Bild (Vollfläche), Vorlage p. 7
+SLIDE_W, SLIDE_H = 33.867, 19.05
+
+
+def slide_07_page():
+    # Vorlage p. 7 (full-picture layout): the facsimile over the full height,
+    # centred (it is narrower than the slide, 1.3 : 1). No title or points:
+    # only the legend band (bottom left, from the slide edge) and the
+    # copyright, set vertically along the image's right edge.
+    s = prs.slides.add_slide(LAYOUT_FULL_PICTURE)
+    remove_ph(s, "pic")
+    from PIL import Image
+
+    with Image.open(os.path.join(HERE, "img", M317_FACSIMILE)) as im:
+        iw_px, ih_px = im.size
+    fh = SLIDE_H
+    fw = fh * iw_px / ih_px
+    fx, fy = (SLIDE_W - fw) / 2, 0.0
+    pic = s.shapes.add_picture(
+        os.path.join(HERE, "img", M317_FACSIMILE), Cm(fx), Cm(fy), Cm(fw), Cm(fh)
     )
-    y0, bw, bh = 4.4, 2.4, 1.3
-    # left: numbering becomes process
+    pic.name = "Facsimile: sketchbook 3, fol. 38v"
+    pic._element.nvPicPr.cNvPr.set(
+        "descr",
+        "Facsimile of Webern's sketchbook 3, folio 38 verso, sixteen systems, with the "
+        "sketches for M 317 boxed and labelled: Sk1 to Sk4.1; dotted boxes mark the "
+        "paratexts: page number, dating, title, instrument indications",
+    )
+
+    # systems 1-3 (shown on the next slide); pixels of the facsimile
+    def px(u, v):
+        return fx + u / iw_px * fw, fy + v / ih_px * fh
+
+    x0, y0 = px(150, 100)
+    x1, y1 = px(1305, 262)
+    rect(
+        s,
+        x0,
+        y0,
+        x1 - x0,
+        y1 - y0,
+        "Mark: systems 1-3 (next slide)",
+        line=T_RED,
+        line_pt=2.0,
+        dash=True,
+    )
+
+    # legend band (Vorlage p. 7: main colour, bottom left, from the slide edge);
+    # lower than in the Vorlage and nearly opaque, so that it covers only the
+    # empty margin below system 16 and stays legible over the facsimile
+    bw, by = 22.4, SLIDE_H - 0.94
+    lb = rect(s, 0.0, by, bw, 0.94, "Band: legend", fill=T_MINT)
+    set_alpha(lb._element.spPr, 90)
     add_text(
         s,
         0.93,
-        y0,
-        13.5,
-        0.6,
-        [("sub", "numbering becomes process")],
-        "Heading: left",
+        by,
+        bw - 1.3,
+        0.94,
+        [("body", FACSIMILE_LEGEND)],
+        "Legend",
+        anchor=MSO_ANCHOR.MIDDLE,
     )
-    xs = [1.3, 6.0, 10.7]
-    labels = ["Sk1", "Sk2", "Sk2.1"]
-    add_text(
+    # copyright, vertical along the right edge of the image, reading upwards
+    cl, ch = 12.0, 0.45
+    cx, cy = fx + fw + 0.25 + ch / 2, SLIDE_H - 0.6 - cl / 2
+    cr = add_text(
         s,
-        1.3,
-        y0 + 1.1,
-        12,
-        0.5,
-        [("caption", "source description: labels")],
-        "Caption: labels",
+        cx - cl / 2,
+        cy - ch / 2,
+        cl,
+        ch,
+        [("source", FACSIMILE_COPYRIGHT)],
+        "Copyright",
     )
-    ny, gy = y0 + 1.9, y0 + 6.4
-    for x, lbl in zip(xs, labels):
-        labelled_box(s, x, ny, bw, bh, lbl, f"Label {lbl}", line=T_MINT, line_pt=1.25)
-        line(
-            s,
-            x + bw / 2,
-            ny + bh + 0.1,
-            x + bw / 2,
-            gy - 0.1,
-            f"Reading: {lbl}",
-            color=T_MINT,
-            pt=1.25,
-            head=True,
-        )
-        labelled_box(s, x, gy, bw, bh, lbl, f"Node {lbl}", fill=T_MINT)
-    add_text(
+    cr.rotation = 270
+    notes(
         s,
-        xs[0] + bw / 2 + 0.3,
-        ny + bh + 0.6,
-        4,
-        0.5,
-        [("caption", "read as")],
-        "Caption: read as",
-    )
-    line(
-        s,
-        xs[0] + bw + 0.1,
-        gy + bh / 2,
-        xs[1] - 0.1,
-        gy + bh / 2,
-        "Edge: precedes",
-        head=True,
-    )
-    line(
-        s,
-        xs[1] + bw + 0.1,
-        gy + bh / 2,
-        xs[2] - 0.1,
-        gy + bh / 2,
-        "Edge: concomitates",
-        dash=True,
-    )
-    for (xa, xb), rel in (
-        ((xs[0], xs[1]), "precedes"),
-        ((xs[1], xs[2]), "concomitates"),
-    ):
-        mid = (xa + bw + xb) / 2
-        add_text(
-            s,
-            mid - 2.2,
-            gy + bh + 0.25,
-            4.4,
-            0.5,
-            [("code_caption", rel)],
-            f"Label: {rel}",
-            align=PP_ALIGN.CENTER,
-        )
-    add_text(
-        s,
-        1.3,
-        gy + bh + 1.1,
-        12,
-        0.5,
-        [("caption", "graph: genetic relations")],
-        "Caption: graph",
+        "Overview: fol. 38v",
+        45,
+        """
+Now to the material itself. Here is a whole page: folio 38 verso of Webern's third sketchbook, with the first sketches for "Wie bin ich froh!". The boxes and numbers are ours: the AWG distinguishes fifteen sketches on this one page.
+
+They do not follow the reading order. Sk2 stands to the left of Sk1, Sk2.1 to the right of both; Sk3 and its variants fill the space below. And the page holds more than music: a title, a dating, a page number, instrument indications – the paratexts, dotted here.
+
+On the next slide, we zoom in on the top three systems [red dashed frame].
+
+ALT TEXT: Full-picture slide. In the centre, over the full height, the facsimile of sketchbook 3, folio 38 verso, sixteen systems, with boxes and labels for the sketches Sk1 to Sk4.1 and dotted boxes for the paratexts; a red dashed frame marks systems 1 to 3. In a mint band at the bottom left: sketchbook 3, fol. 38v, sketches for op. 25/1 (M 317), markings by the AWG. Vertically along the right edge of the image: © Paul Sacher Stiftung, Basel, Sammlung Anton Webern.
+""",
     )
 
-    # right: three editions, one superclass
-    rx = 16.6
+
+# M 317, source op. 25:A, fol. 38v, systems 1-3: Sk2, Sk1 and Sk2.1 superimposed.
+# Rendered once by make_m317_excerpt.py; crop box in SVG units of the sheets.
+M317_EXCERPT = "m317-38v-sk1-sk2-sk2_1.png"
+M317_CROP = (138, 160, 1008, 305)
+
+
+def slide_07_example():
+    s = content_slide(
+        "On one sketchbook page, both relations are at work",
+        "Example: M 317, fol. 38v",
+        watermark=False,
+    )
+    ix, iy, iw = 0.93, 6.25, 32.0
+    cx0, cy0, cx1, cy1 = M317_CROP
+    ih = iw * (cy1 - cy0) / (cx1 - cx0)
+
+    def sx(u):  # SVG x -> slide cm
+        return ix + (u - cx0) / (cx1 - cx0) * iw
+
+    def sy(v):
+        return iy + (v - cy0) / (cy1 - cy0) * ih
+
+    pic = s.shapes.add_picture(
+        os.path.join(HERE, "img", M317_EXCERPT), Cm(ix), Cm(iy), Cm(iw), Cm(ih)
+    )
+    pic.name = "Excerpt: M 317 Sk2, Sk1, Sk2.1"
+    pic._element.nvPicPr.cNvPr.set(
+        "descr",
+        "Diplomatic transcription of M 317, sketchbook folio 38v, systems 1 to 3: "
+        "on system 1 from left to right Sk2 (two twelve-tone rows), Sk1 (four-note figure) "
+        "and Sk2.1 (melody with text 'Wie bin ich froh!'), continued on systems 2 and 3",
+    )
+
+    # brackets over the three sketches (system 1), labels on top
+    by, bh, bw = 4.6, 0.8, 2.0
+    regions = [  # (label, SVG x from, to)
+        ("Sk2", 172, 412),
+        ("Sk1", 418, 588),  # deletion bracket moved to x = 586 (make_m317_excerpt.py)
+        ("Sk2.1", 602, 1005),
+    ]
+    centers = {}
+    for lbl, u0, u1 in regions:
+        x0, x1 = sx(u0), sx(u1)
+        c = (x0 + x1) / 2
+        centers[lbl] = c
+        labelled_box(s, c - bw / 2, by, bw, bh, lbl, f"Sketch {lbl}", fill=T_MINT)
+        line(s, x0, 5.85, x1, 5.85, f"Bracket: {lbl}", color=T_MINT, pt=1.25)
+        for xx in (x0, x1):
+            line(s, xx, 5.85, xx, 6.1, f"Bracket end: {lbl}", color=T_MINT, pt=1.25)
+        line(s, c, by + bh, c, 5.85, f"Bracket stem: {lbl}", color=T_MINT, pt=1.25)
+
+    # Sk1 -> Sk2: the order runs from right to left on the page
+    line(
+        s,
+        centers["Sk1"] - bw / 2 - 0.1,
+        by + bh / 2,
+        centers["Sk2"] + bw / 2 + 0.1,
+        by + bh / 2,
+        "Edge: Sk1 precedesScripture Sk2",
+        head=True,
+    )
     add_text(
         s,
-        rx,
-        y0,
-        16.3,
-        0.6,
-        [("sub", "three editions, one superclass")],
-        "Heading: right",
+        centers["Sk2"] + bw / 2,
+        by - 0.3,
+        centers["Sk1"] - centers["Sk2"] - bw,
+        0.5,
+        [("code_caption", "precedesScripture")],
+        "Label: precedesScripture",
+        align=PP_ALIGN.CENTER,
     )
-    cw, cg = 5.0, 0.5
-    cxs = [rx + i * (cw + cg) for i in range(3)]
-    ccs = [x + cw / 2 for x in cxs]
-    labelled_box(
+
+    # red mark: the crowded right end of Sk2
+    rect(
         s,
-        ccs[1] - 3.3,
-        y0 + 1.1,
-        6.6,
-        bh,
-        "EditedMusicText",
-        "EditedMusicText",
-        fill=T_MINT,
+        sx(343),
+        sy(186),
+        sx(416.5) - sx(343),
+        sy(217) - sy(186),
+        "Mark: crowded end of Sk2",
+        line=T_RED,
+        line_pt=2.25,
     )
-    sy = y0 + 4.4
-    tree(s, ccs[1], y0 + 1.1 + bh, ccs, sy, "Tree: EditedMusicText")
-    for x, cls in zip(cxs, ["WorkEdition", "TextEdition", "SketchEdition"]):
-        labelled_box(s, x, sy, cw, bh, cls, cls, fill=T_MINT, brightness=0.6)
-    ty = sy + 4.2
-    labelled_box(
+    # green marks: g gives way to f sharp in both (Sk2 row B, 4th tone: f sharp
+    # overwrites g, tkk sk2-003; Sk2.1 bar 2: g struck out, tkk sk2_1-003)
+    for name, (u0, v0, u1, v1) in (
+        ("Sk2, row B: f sharp overwrites g", (308.5, 186, 331, 207)),
+        ("Sk2.1, bar 2: g struck out, then f sharp", (686, 188, 736, 213)),
+    ):
+        rect(
+            s,
+            sx(u0),
+            sy(v0),
+            sx(u1) - sx(u0),
+            sy(v1) - sy(v0),
+            f"Mark: {name}",
+            line=T_DARKGREEN,
+            line_pt=2.25,
+        )
+
+    # Sk2 -- Sk2.1 below the excerpt: concomitates
+    ly = iy + ih + 0.55
+    for lbl in ("Sk2", "Sk2.1"):
+        line(
+            s,
+            centers[lbl],
+            iy + ih + 0.15,
+            centers[lbl],
+            ly,
+            f"Edge stem: {lbl}",
+            dash=True,
+        )
+    line(
         s,
-        cxs[0],
-        ty,
-        2 * cw + cg,
-        bh,
-        "TextVersion",
-        "Target: TextVersion",
-        line=T_DARKGREEN,
-        line_pt=1.25,
+        centers["Sk2"],
+        ly,
+        centers["Sk2.1"],
+        ly,
+        "Edge: Sk2.1 concomitates Sk2",
         dash=True,
     )
-    labelled_box(s, cxs[2], ty, cw, bh, "Sketch", "Target: Sketch", fill=T_MINT)
-    for cc, cls in zip(ccs, ["WorkEdition", "TextEdition", "SketchEdition"]):
-        line(s, cc, sy + bh + 0.1, cc, ty - 0.1, f"Edge: edits ({cls})", head=True)
+    add_text(
+        s,
+        centers["Sk2"],
+        ly + 0.1,
+        centers["Sk2.1"] - centers["Sk2"],
+        0.5,
+        [("code_caption", "concomitates")],
+        "Label: concomitates",
+        align=PP_ALIGN.CENTER,
+    )
+
+    ty = 13.15
+    for i, (a, rel, b, text) in enumerate(
+        [
+            (
+                "Sk1 ",
+                "precedesScripture",
+                " Sk2",
+                "The right end of Sk2 is squeezed together (red): "
+                "Sk1 already took the space. The writing alone gives the order.",
+            ),
+            (
+                "Sk2.1 ",
+                "concomitates",
+                " Sk2",
+                "In both, g gives way to f♯ (green): Sk2.1 and row B of Sk2 "
+                "shape each other. Neither comes first.",
+            ),
+        ]
+    ):
+        x = 0.93 + i * 16.4
         add_text(
             s,
-            cc + 0.25,
-            sy + bh + 1.2,
-            2.4,
-            0.5,
-            [("code_caption", "edits")],
-            f"Label: edits ({cls})",
+            x,
+            ty,
+            15.6,
+            3.0,
+            [[("sub", a), ("sub_code", rel), ("sub", b)], ("body", text)],
+            f"Evidence: {rel}",
+            space_after=4,
         )
     add_text(
         s,
-        rx,
-        ty + bh + 0.5,
-        16.3,
-        0.5,
-        [("caption", "what the edition makes, linked to what it edits")],
-        "Caption: edits",
+        0.93,
+        16.45,
+        32.0,
+        0.6,
+        [
+            (
+                "caption",
+                "Source: AWG online edition, M 317 Sk2, Sk1, Sk2.1, source op. 25:A, fol. 38v, "
+                "systems 1–3, superimposed (development version, 12 Nov 2026)",
+            )
+        ],
+        "Source line",
     )
     notes(
         s,
-        "Semantic shifts",
+        "Example: M 317",
         90,
         """
-Modelling makes explicit what editorial practice leaves implicit. Two examples.
+Here are both relations on one page of Webern's sketchbook: the first sketches for "Wie bin ich froh!", the first song of op. 25, dated 4 July 1934. What you see is the AWG's diplomatic transcription of folio 38v, systems 1 to 3. The edition gives each sketch on its own sheet; here I have put three of them back on the page together.
 
-Left: in the source description, Sk1, Sk2 and Sk2.1 are labels – a numbering. The generator reads this numbering as a genetic process: Sketch 1 precedes Sketch 2, and the sub-sketch 2.1 concomitates with Sketch 2. A label becomes a genetic claim. Often that is right, because editors number in genetic order – but it is a claim all the same, without any evidence type. Here the graph closes what the numbering left open. And the generator never relates sketches across complexes – which is exactly where op. 25 becomes interesting.
+[Point to Sk1.] In the middle, Sk1: a four-note figure – the opening of the voice part.
 
-Right: the AWG has three forms of edition – work editions, text editions and sketch editions. In the model they are subclasses of EditedMusicText: what the edition produces. Each is linked by "edits" to what it edits: work and text editions to a TextVersion, sketch editions to a Sketch. So the edited sheet and its object are kept apart.
+[Point to Sk2.] To its left, Sk2: a twelve-tone row, in two attempts. Why does Sk1 come first, although it stands to the right? Look at the right end of Sk2 [red mark]: the writing is squeezed together. Sk2 ran into the space that Sk1 already occupied. That is precedesScripture: an order from the writing alone. On this page, the order runs from right to left.
 
-ALT TEXT: Two panels. Left, "numbering becomes process": the labels Sk1, Sk2, Sk2.1 are read as graph nodes; Sk1 precedes Sk2 (solid arrow), Sk2.1 concomitates with Sk2 (dashed line). Right: EditedMusicText is the superclass of WorkEdition, TextEdition and SketchEdition; arrows labelled "edits" lead from the first two to TextVersion and from SketchEdition to Sketch.
+[Point to Sk2.1.] On the right, Sk2.1 turns the rhythm of Sk1 into a melody with text, and its last layer articulates row B of Sk2. The commentary says that row B was written "in dynamic alignment" with Sk2.1 and its variants. You can see it in one note [green marks]: in bar 2 of Sk2.1, Webern strikes out the g and goes on with f sharp; in row B of Sk2, he writes f sharp over the g – the grey note is the overwritten one. The same decision, in both places. Each shaped the other; neither came first. That is concomitates.
+
+So one page holds both: an order the writing proves, and an exchange that no order captures. Even the dating "4. VII. 34" is modelled this way: it concomitates with Sk1 and with Sk2, because the editors cannot say with which of the two it was written.
+
+ALT TEXT: The diplomatic transcription of M 317, folio 38v, systems 1 to 3, across the slide. Labels above system 1 mark three sketches from left to right: Sk2, Sk1, Sk2.1. An arrow labelled precedesScripture points from Sk1 to Sk2, that is, from right to left. A red rectangle marks the crowded right end of Sk2. Two green rectangles mark where g gives way to f sharp: in row B of Sk2 (f sharp written over a grey g) and in bar 2 of Sk2.1 (g struck out, followed by f sharp). Below the excerpt, a dashed line labelled concomitates connects Sk2.1 and Sk2. Two text blocks: Sk1 precedesScripture Sk2 – the right end of Sk2 is squeezed together, Sk1 already took the space, the writing alone gives the order; Sk2.1 concomitates Sk2 – in both, g gives way to f sharp (green), Sk2.1 and row B of Sk2 shape each other, neither comes first.
 """,
     )
 
 
 def slide_09():
     s = content_slide(
-        "The model transfers, the pipeline does not", "What transfers", watermark=False
+        "The model could transfer; the pipeline cannot",
+        "What transfers",
+        watermark=False,
     )
     y0, cw, gap, ih, ig = 4.4, 15.6, 0.8, 1.15, 0.3
     columns = [
@@ -1522,6 +1872,11 @@ def slide_09():
             [
                 ("bold", "the pipeline", "the generator reads the AWG's own data"),
                 ("bold", "the Moldenhauer catalogue", "M numbers name the complexes"),
+                (
+                    "bold",
+                    "the numbering conventions",
+                    "Sk1 before Sk2 is read as precedes, without evidence type",
+                ),
             ],
         ),
     ]
@@ -1589,17 +1944,252 @@ def slide_09():
     notes(
         s,
         "What transfers",
-        120,
+        150,
         """
 What of this model would transfer to other editions? I would separate two things.
 
 Portable is the core of the model. Inscription, Document, Folio and Placement describe what is written where: on which object, on which page side, on which staves and measures. And the two genetic relations describe order without forcing a single line: precedes, with its two subproperties, for sequence, and concomitates for inscriptions written side by side. None of this is specific to Webern. Any edition of sketches and drafts needs the same distinctions. Placement, for instance, is a node of its own between an inscription and a page side: it records staves and measures for each page, so that one sketch can run across several pages without losing its place on any of them.
 
-Tied to the AWG is the pipeline. The generator reads the edition's own data: its source descriptions, its sheet IDs, its numbering conventions. Another edition would need its own generator, or would have to bring its data into the same shape. The same holds for the Moldenhauer catalogue. M numbers name our edition complexes. That works for Webern because Moldenhauer catalogued the estate, including the unfinished pieces. Other repertoires have other catalogues, or none. And the numbering conventions are an even deeper tie: the generator derives precedes from "Sketch 1 before Sketch 2" – a convention of the AWG's editors, not of genetic criticism in general. Even within the AWG, the pipeline knows nothing about relations across complexes; those come only from curation.
+Tied to the AWG is the pipeline. The generator reads the edition's own data: its source descriptions, its sheet IDs, its numbering conventions. Another edition would need its own generator, or would have to bring its data into the same shape. The same holds for the Moldenhauer catalogue. M numbers name our edition complexes. That works for Webern because Moldenhauer catalogued the estate, including the unfinished pieces. Other repertoires have other catalogues, or none. And the numbering conventions are an even deeper tie. The generator reads the numbering as a genetic process: Sketch 1 precedes Sketch 2, and the sub-sketch 2.1 concomitates with Sketch 2. A label becomes a genetic claim. Often that is right, because editors number in genetic order – but it is a claim all the same, without any evidence type, and a convention of the AWG's editors, not of genetic criticism in general. Even within the AWG, the pipeline knows nothing about relations across complexes; those come only from curation.
 
 So the honest statement is the one at the bottom: transfer to other repertoires is plausible, but untested. We have not yet modelled another composer's sketches. I would be very interested to hear whether these classes fit the material you work on.
 
-ALT TEXT: Two columns. Left, "portable": Inscription, Document, Folio, Placement, precedes and concomitates, each with a short gloss. Right, "tied to the AWG": the pipeline and the Moldenhauer catalogue. Bottom line: transfer to other repertoires is plausible but untested.
+ALT TEXT: Two columns. Left, "portable": Inscription, Document, Folio, Placement, precedes and concomitates, each with a short gloss. Right, "tied to the AWG": the pipeline, the Moldenhauer catalogue, and the numbering conventions – Sk1 before Sk2 is read as precedes, without evidence type. Bottom line: transfer to other repertoires is plausible but untested.
+""",
+    )
+
+
+# Curated statements of the op. 25 graph around the first sketches of M 317.
+# node: (centre x, centre y in cm, label, kind)
+EXPLORE_NODES = {
+    "date": (4.55, 4.85, "4. VII. 34", "para"),
+    "Sk1": (2.5, 6.6, "Sk1", "main"),
+    "Sk2": (6.6, 6.6, "Sk2", "main"),
+    "Sk3": (10.7, 6.6, "Sk3", "main"),
+    "Sk4": (14.4, 6.6, "Sk4", "main"),
+    "M321": (18.0, 6.6, "M 321 Sk1", "main"),
+    "Sk3.1": (13.6, 9.2, "Sk3.1", "sub"),
+    "Sk2.1": (6.6, 9.2, "Sk2.1", "sub"),
+    "Sk2.1.1": (2.5, 11.8, "Sk2.1.1", "sub"),
+    "Sk2.1.2": (6.6, 11.8, "Sk2.1.2", "sub"),
+    "Sk2.1.3": (10.7, 11.8, "Sk2.1.3", "sub"),
+    "Sk2.1.2.1": (6.6, 14.2, "Sk2.1.2.1", "sub"),
+}
+NODE_W, NODE_H = 2.7, 0.8
+EXPLORE_EDGES = [  # (from, to, kind): arrow = precedes (or subproperty), dash = concomitates
+    ("Sk1", "Sk2", "arrow"),
+    ("Sk2", "Sk3", "arrow"),
+    ("Sk3", "Sk4", "arrow"),
+    ("Sk4", "M321", "arrow"),
+    ("date", "Sk1", "dash"),
+    ("date", "Sk2", "dash"),
+    ("Sk2.1", "Sk2", "dash"),
+    ("Sk3.1", "Sk3", "dash"),
+    ("Sk2.1.1", "Sk2.1", "dash"),
+    ("Sk2.1.2", "Sk2.1", "dash"),
+    ("Sk2.1.3", "Sk2.1", "dash"),
+    ("Sk2.1.2.1", "Sk2.1.2", "dash"),
+    ("Sk2.1.1", "Sk2.1.2", "red_arrow"),  # "presumably" in the commentary, no tag
+    ("Sk1", "Sk2.1", "missing"),  # in the commentary, not in the graph
+]
+
+
+def node_w(kind):
+    return 3.6 if kind == "para" else NODE_W
+
+
+def border_point(cx, cy, tx, ty, w=NODE_W, gap=0.1):
+    """Where the line from a node centre towards (tx, ty) leaves the node box."""
+    dx, dy = tx - cx, ty - cy
+    hw, hh = w / 2 + gap, NODE_H / 2 + gap
+    k = min(hw / abs(dx) if dx else 1e9, hh / abs(dy) if dy else 1e9)
+    return cx + dx * k, cy + dy * k
+
+
+def slide_09_explore():
+    s = content_slide(
+        "The graph shows patterns the commentary spreads out – and gaps it hides",
+        "Exploring the graph: M 317",
+        watermark=False,
+    )
+    # cluster: Sk2.1 with its variants
+    cl = rect(
+        s,
+        1.0,
+        8.45,
+        11.2,
+        6.45,
+        "Cluster: Sk2.1 and its variants",
+        fill=T_MINT,
+        shape=MSO_SHAPE.ROUNDED_RECTANGLE,
+    )
+    set_alpha(cl._element.spPr, 30)
+    add_text(
+        s,
+        8.0,
+        13.75,
+        4.0,
+        1.0,
+        [("caption", "one work phase,"), ("caption", "five entries")],
+        "Caption: cluster",
+        align=PP_ALIGN.RIGHT,
+    )
+
+    pos = {k: (x, y, node_w(kind)) for k, (x, y, _, kind) in EXPLORE_NODES.items()}
+    for a, b, kind in EXPLORE_EDGES:
+        (xa, ya, wa), (xb, yb, wb) = pos[a], pos[b]
+        x1, y1 = border_point(xa, ya, xb, yb, wa)
+        x2, y2 = border_point(xb, yb, xa, ya, wb)
+        if kind == "missing":
+            c = line(s, x1, y1, x2, y2, f"Missing edge: {a} – {b}", color=T_RED, pt=2.0)
+            c.line.dash_style = MSO_LINE.ROUND_DOT
+            add_text(
+                s,
+                (x1 + x2) / 2 - 1.0,
+                (y1 + y2) / 2 - 0.35,
+                0.6,
+                0.6,
+                [("red_caption", "?")],
+                "Label: missing edge",
+            )
+        elif kind == "red_arrow":
+            line(
+                s,
+                x1,
+                y1,
+                x2,
+                y2,
+                f"Edge: {a} precedes {b}",
+                color=T_RED,
+                pt=2.0,
+                head=True,
+            )
+        else:
+            line(
+                s,
+                x1,
+                y1,
+                x2,
+                y2,
+                f"Edge: {a} – {b}",
+                head=kind == "arrow",
+                dash=kind == "dash",
+            )
+    for key, (x, y, label, kind) in EXPLORE_NODES.items():
+        kw = {
+            "main": dict(fill=T_MINT),
+            "sub": dict(fill=T_MINT, brightness=0.6),
+            "para": dict(line=T_DARKGREEN, line_pt=1.0, dash=True),
+        }[kind]
+        labelled_box(
+            s,
+            x - node_w(kind) / 2,
+            y - NODE_H / 2,
+            node_w(kind),
+            NODE_H,
+            label,
+            f"Node {key}",
+            style="code_caption",
+            **kw,
+        )
+    add_text(
+        s,
+        1.2,
+        12.4,
+        3.9,
+        1.0,
+        [("red_caption", "“presumably”,"), ("red_caption", "no tag")],
+        "Label: untagged statement",
+    )
+
+    # legend
+    lg_y = 15.35
+    items = [
+        ("precedes", dict(head=True), None),
+        ("concomitates", dict(dash=True), None),
+        (
+            "in the commentary, not in the graph",
+            dict(color=T_RED, pt=2.0),
+            MSO_LINE.ROUND_DOT,
+        ),
+    ]
+    x = 1.0
+    for text, kw, dash_style in items:
+        c = line(s, x, lg_y + 0.25, x + 1.2, lg_y + 0.25, f"Legend: {text}", **kw)
+        if dash_style is not None:
+            c.line.dash_style = dash_style
+        w = 0.25 * len(text) + 0.4
+        add_text(s, x + 1.4, lg_y, w, 0.5, [("caption", text)], f"Legend text: {text}")
+        x += 1.4 + w + 0.5
+
+    # right panel (Vorlage p. 3: light panel with arrow list)
+    px, py, pw, ph = 20.6, 4.4, 12.33, 11.75
+    panel = rect(s, px, py, pw, ph, "Panel: what the graph shows", fill=T_MINT)
+    set_alpha(panel._element.spPr, 50)
+    points = [
+        (
+            "Clusters",
+            "Sk2.1 and its variants: one work phase at a glance.",
+        ),
+        (
+            "Paths",
+            "From Sk1 to Sk4 and on into M 321: the work leaves the song.",
+        ),
+        (
+            "Gaps",
+            "Sk2.1 builds on Sk1, but no edge says so. A “presumably” has no tag.",
+        ),
+    ]
+    paras = []
+    for head, text in points:
+        paras += [("sub", f"→ {head}"), ("body", text)]
+    add_text(s, px + 0.7, py + 0.7, pw - 1.4, 8.0, paras, "Points", space_after=6)
+    add_text(
+        s,
+        px + 0.7,
+        py + ph - 2.1,
+        pw - 1.4,
+        1.6,
+        [
+            (
+                "bold",
+                "The graph does not discover. It makes commentary and data comparable.",
+            )
+        ],
+        "Point: conclusion",
+        anchor=MSO_ANCHOR.BOTTOM,
+    )
+    add_text(
+        s,
+        0.93,
+        16.45,
+        32.0,
+        0.6,
+        [
+            (
+                "caption",
+                "Selection from the curated layer of the op. 25 graph (M 317), "
+                "drawn from the data (development version, 12 Nov 2026)",
+            )
+        ],
+        "Source line",
+    )
+    notes(
+        s,
+        "Exploring the graph: M 317",
+        90,
+        """
+What does the graph add to the commentary? Not new facts – everything here was asserted by the editors. But it shows them differently. Three things, back on the first sketches of M 317.
+
+Clusters. Sk2.1 and its variants all concomitate – with Sk2.1, and through it with Sk2. In the commentary, that is five separate entries, each saying "in dynamic alignment with". In the graph it is one shape [point to the shaded area]: a work phase you see at a glance.
+
+Paths. The precedes chain runs from Sk1 through Sk4 – and then on into M 321, the third song. The order of work leaves the song, as we saw in the graph of op. 25. You follow a path; you don't reassemble it from page references.
+
+Gaps. And here the graph and the commentary disagree. The commentary says that Sk2.1 builds on the rhythm of Sk1 – but there is no edge between them [red dotted line]; in the graph, Sk2.1 hangs on Sk1 only by way of Sk2. And Sk2.1.2 is "presumably" the continuation of Sk2.1.1 – but the statement carries no uncertainty tag, so it counts as certain. Reading the commentary entry by entry, you don't see either. In the graph, a missing line is visible, and a query lists every statement without a tag, to be checked against the text.
+
+So the graph does not discover anything by itself. It makes commentary and data comparable. We will come back to such frictions in a moment.
+
+ALT TEXT: Left, a graph of the first sketches of M 317 drawn from the curated data. Top row, linked by precedes arrows: Sk1, Sk2, Sk3, Sk4, M 321 Sk1. Above Sk1 and Sk2, the dating "4. VII. 34", linked to both by dashed lines. Below Sk2, a shaded cluster: Sk2.1 with its variants Sk2.1.1, Sk2.1.2, Sk2.1.3 and Sk2.1.2.1, linked by dashed concomitates lines; caption "one work phase, five entries". Below Sk3, Sk3.1, dashed. In red: an arrow from Sk2.1.1 to Sk2.1.2, labelled "presumably, no tag", and a dotted line with a question mark from Sk1 to Sk2.1, marked in the legend as "in the commentary, not in the graph". Right, a light panel with three points: Clusters – Sk2.1 and its variants, one work phase at a glance; Paths – from Sk1 to Sk4 and on into M 321, the work leaves the song; Gaps – Sk2.1 builds on Sk1, but no edge says so, a "presumably" has no tag. At the bottom of the panel: The graph does not discover. It makes commentary and data comparable.
 """,
     )
 
@@ -1625,7 +2215,7 @@ def slide_10():
             "data lags model",
             32.93 - cw,
             [
-                ("sketchbooks", "per complex: SB3 as two excerpts", None),
+                ("sketchbooks", "per complex: sketchbook 3 as two excerpts", None),
                 (
                     [("code", "Sk##"), ("bold", " placeholders")],
                     "29 sketches without stable identifier",
@@ -1755,7 +2345,10 @@ def slide_11():
         1.8,
         [
             [
-                ("band_bold", "The sketch is content and object at once"),
+                (
+                    "band_bold",
+                    "A sketch's genetic place rests on content and material traces together",
+                ),
                 ("band_body", " – which LRMoo separates (F2 Expression vs. F5 Item)."),
             ]
         ],
@@ -1811,9 +2404,9 @@ Other vocabularies we reuse outright, because their meaning fits exactly: Dublin
 
 MEI is not integrated. Our edited music texts are SVG sheets, not MEI encodings; linking graph nodes to MEI elements is a later step.
 
-And here – the statement at the top of the slide – is where the standard does not fit. LRMoo separates content and object: the expression on the one hand, the item that carries it on the other. For a printed edition that is a clean cut. For a sketch it is not. A sketch is content and object at once: its position on the page, its overlay with other inscriptions, the writing instrument – these physical facts are the evidence for its genetic place. Split it into F2 and F5, and you split the argument. So the AWG keeps Sketch as one class and only points to LRMoo.
+And here – the statement at the top of the slide – is where the standard does not fit. LRMoo separates content and object: the expression on the one hand, the item that carries it on the other. For a printed edition that is a clean cut. For a sketch it is not. Its genetic place is argued from both at once: from what it contains – a rhythm taken up, a note changed in two places – and from where and how it stands on the page – the space it takes, what it overwrites, pencil or ink. You will see both shortly, on one sketchbook page. Split the sketch into F2 and F5, and you split the argument. So the AWG keeps Sketch as one class and only points to LRMoo.
 
-ALT TEXT: At the top, in a dark teal band: the sketch is content and object at once, which LRMoo separates (F2 Expression vs. F5 Item). Below, a table with three columns – standard, in the AWG model, link. LRMoo: edition complex about F1 Work, version and sketch about F2 Expression, document about F5 Item (rdfs:seeAlso). CIDOC CRM: temporal reading, precedes about P176, concomitates about P174 (rdfs:seeAlso). Dublin Core terms, SKOS, PROV, rdf:Statement: reused outright (used directly). MEI: not integrated.
+ALT TEXT: At the top, in a dark teal band: a sketch's genetic place rests on content and material traces together, which LRMoo separates (F2 Expression vs. F5 Item). Below, a table with three columns – standard, in the AWG model, link. LRMoo: edition complex about F1 Work, version and sketch about F2 Expression, document about F5 Item (rdfs:seeAlso). CIDOC CRM: temporal reading, precedes about P176, concomitates about P174 (rdfs:seeAlso). Dublin Core terms, SKOS, PROV, rdf:Statement: reused outright (used directly). MEI: not integrated.
 """,
     )
 
@@ -1843,7 +2436,7 @@ def slide_12():
     band_panel = rect(s, px, top, 32.93 - px, h, "Panel: conclusions", fill=T_MINT)
     set_alpha(band_panel._element.spPr, 50)
     statements = [
-        [("statement", "Layers show where editorial judgment begins.")],
+        [("statement", "Layers show where editorial judgment becomes explicit.")],
         [("statement", "Warnings show where the data disagree.")],
         [
             ("statement", "Model and data are written side by side: "),
@@ -1883,11 +2476,11 @@ def slide_12():
     notes(
         s,
         "Conclusion and outlook",
-        120,
+        135,
         """
 Back to the opening question: can the graph keep claims as open as the evidence demands? Partly. The model has means for openness: concomitates instead of an invented order, plain precedes where the evidence is not specified, a certainty tag on a statement. Where it has none, openness survives as free text and gaps – readable, but not queryable. And where the generator reads numbering as process, it closes more than the editors claimed. Three conclusions follow.
 
-First: layers show where editorial judgment begins. The generated layer says what follows from the data; the curated layer says what editors assert. In op. 25, the difference is the chain across the songs: the editors' argument, made visible.
+First: layers show where editorial judgment becomes explicit. The generated layer already rests on editorial decisions – the numbering, the source descriptions – but leaves them implicit; the curated layer states what editors assert. In op. 25, the difference is the chain across the songs: the editors' argument, made visible.
 
 Second: warnings show where the data disagree. The generator does not silently repair the data. Every placeholder, every incomplete date, every conflict between folio and label is reported.
 
@@ -1895,7 +2488,7 @@ Third: model and data are written side by side – concomitant, in the sense of 
 
 Next steps: the editorial statements will move into named graphs, so that, for example, the ink and pencil layers of a sketch can be kept apart. Today about 116 curated edges are reified as statements; then statement nodes remain only where uncertainty or a justification needs them. And persons and archives, so far only open questions, will become part of the model.
 
-ALT TEXT: Left, a pale teal detail of the op. 25 graph with node labels. Right, a mint panel with three conclusions: layers show where editorial judgment begins; warnings show where the data disagree; model and data are written side by side – concomitant. Below: next steps, named graphs for ink and pencil layers, persons, archives.
+ALT TEXT: Left, a pale teal detail of the op. 25 graph with node labels. Right, a mint panel with three conclusions: layers show where editorial judgment becomes explicit; warnings show where the data disagree; model and data are written side by side – concomitant. Below: next steps, named graphs for ink and pencil layers, persons, archives.
 """,
     )
 
@@ -1927,7 +2520,12 @@ def slide_13():
         11.2,
         28.5,
         2.9,
-        [("closing_light", "Whose genetic order does the graph show – Webern's or ours?")],
+        [
+            (
+                "closing_light",
+                "Whose genetic order does the graph show – Webern's or ours?",
+            )
+        ],
         "Question",
     )
     add_text(
@@ -1940,7 +2538,7 @@ def slide_13():
             (
                 "closing_sub_light",
                 "How much of Webern's compositional process survives translation "
-                "into shared standards?",
+                "into formal models?",
             )
         ],
         "Second question",
@@ -1964,13 +2562,13 @@ I would like to end with a question rather than a result.
 
 If model and data shape each other – if they are, in our own term, concomitant – then the graph is not simply Webern's process, read off the documents. It is also our construction: our numbering, our evidence types, our decisions about what counts as a relation. So: whose genetic order does the graph show – Webern's, or ours?
 
-The second question looks outward. A sketch whose page is its argument is exactly what a shared standard tends to split. So: how much of Webern's compositional process survives translation into shared standards?
+The second question looks outward. A sketch whose page is its argument is exactly what a formal model tends to split. So: how much of Webern's compositional process survives translation into formal models?
 
 I look forward to your answers – and to your material. Thank you.
 
-STAGE: Stay on this slide during the discussion; go to slide 14 (contact) only at the very end.
+STAGE: Stay on this slide during the discussion; go to the next slide (contact) only at the very end.
 
-ALT TEXT: Behind the slide, a pale image of another region of the full op. 25 graph. In a dark teal band, in white: whose genetic order does the graph show – Webern's or ours? Below, smaller: how much of Webern's compositional process survives translation into shared standards?
+ALT TEXT: Behind the slide, a pale image of another region of the full op. 25 graph. In a dark teal band, in white: whose genetic order does the graph show – Webern's or ours? Below, smaller: how much of Webern's compositional process survives translation into formal models?
 """,
     )
 
@@ -2007,37 +2605,43 @@ def slide_14():
         "Contact",
         0,
         """
-STAGE: Show only after the discussion (or when the chair closes the session); no spoken text. Slide 13 stays up during the Q&A.
+STAGE: Show only after the discussion (or when the chair closes the session); no spoken text. The closing question (previous slide) stays up during the Q&A.
 """,
     )
 
 
 SECTIONS = (
-    ["Introduction"] * 4
-    + ["Terminology"] * 4
-    + ["Transferability"] * 2
-    + ["Standards"]
+    ["Introduction"] * 7
+    + ["Terminology"] * 3
+    + ["Beyond the AWG"] * 2
+    + ["The model at work"] * 5
     + ["Conclusion"] * 3
 )
 
 for build_slide in (
     slide_01,
     slide_02,
+    slide_02_editions,
     slide_03,
-    slide_04,
+    slide_04_generated,
+    slide_04_curated,
+    slide_04_both,
     slide_05,
     slide_06,
     slide_07,
-    slide_08,
-    slide_09,
-    slide_10,
     slide_11,
+    slide_09,
+    slide_07_page,
+    slide_07_example,
+    slide_09_m307,
+    slide_09_explore,
+    slide_10,
     slide_12,
     slide_13,
     slide_14,
 ):
     build_slide()
-assert ELAPSED[0] == 20 * 60, ELAPSED[0]
+assert ELAPSED[0] == TOTAL, ELAPSED[0]
 
 # ================================================================ drop template slides
 sld_id_lst = prs.slides._sldIdLst
@@ -2077,21 +2681,38 @@ print("saved", OUT, len(prs.slides), "slides")
 SOFFICE = shutil.which("soffice") or r"C:\Program Files\LibreOffice\program\soffice.exe"
 PDF = os.path.splitext(os.path.abspath(OUT))[0] + ".pdf"
 work = tempfile.mkdtemp(prefix="lo_awg_")
-subprocess.run(
-    [
-        SOFFICE,
-        f"-env:UserInstallation=file:///{work.replace(os.sep, '/')}/profile",
-        "--headless",
-        "--convert-to",
-        "pdf",
-        "--outdir",
-        work,
-        OUT,
-    ],
-    check=True,
-    timeout=300,
-    capture_output=True,
-)
+if os.path.exists(SOFFICE):
+    subprocess.run(
+        [
+            SOFFICE,
+            f"-env:UserInstallation=file:///{work.replace(os.sep, '/')}/profile",
+            "--headless",
+            "--convert-to",
+            "pdf",
+            "--outdir",
+            work,
+            OUT,
+        ],
+        check=True,
+        timeout=300,
+        capture_output=True,
+    )
+else:  # no LibreOffice: export with PowerPoint (Windows, COM)
+    src = os.path.abspath(OUT).replace("'", "''")
+    dst = os.path.join(work, os.path.basename(PDF)).replace("'", "''")
+    subprocess.run(
+        [
+            "powershell",
+            "-NoProfile",
+            "-Command",
+            "$pp = New-Object -ComObject PowerPoint.Application; "
+            f"$d = $pp.Presentations.Open('{src}', $true, $false, $false); "
+            f"$d.SaveAs('{dst}', 32); $d.Close(); $pp.Quit()",
+        ],
+        check=True,
+        timeout=300,
+        capture_output=True,
+    )
 try:
     shutil.copyfile(os.path.join(work, os.path.basename(PDF)), PDF)
     print("saved", PDF)
@@ -2108,14 +2729,23 @@ def make_grid(pdf, out_jpg, cols=3, dpi=50, gap=12):
     from PIL import Image, ImageDraw, ImageFont
 
     pdftoppm = shutil.which("pdftoppm")
-    if pdftoppm is None:
-        print("grid skipped: pdftoppm not found")
-        return
-    subprocess.run(
-        [pdftoppm, "-jpeg", "-r", str(dpi), pdf, os.path.join(work, "page")],
-        check=True,
-        timeout=300,
-    )
+    if pdftoppm is not None:
+        subprocess.run(
+            [pdftoppm, "-jpeg", "-r", str(dpi), pdf, os.path.join(work, "page")],
+            check=True,
+            timeout=300,
+        )
+    else:
+        try:
+            import pymupdf
+        except ImportError:
+            print("grid skipped: neither pdftoppm nor pymupdf found")
+            return
+        with pymupdf.open(pdf) as doc:
+            for i, page in enumerate(doc):
+                page.get_pixmap(dpi=dpi).save(
+                    os.path.join(work, f"page-{i + 1:02d}.jpg")
+                )
     pages = sorted(
         f for f in os.listdir(work) if f.startswith("page") and f.endswith(".jpg")
     )
