@@ -1,4 +1,4 @@
-"""Build the two-page handout AWG-Graph-Handout.docx (+ PDF) for the genetics2026 talk.
+"""Build the two-page handout AWG-Graph-Handout-v2.docx (+ PDF) for the genetics2026 talk.
 
 The handout follows the order of the slides and carries the reference detail
 the slides only speak: the forms of edition, terms and classes, relation
@@ -29,7 +29,7 @@ from PIL import Image, ImageDraw, ImageFont
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 TEMPLATE = os.path.join(HERE, "handout-template.docx")
-OUT = os.path.join(os.path.dirname(HERE), "AWG-Graph-Handout.docx")
+OUT = os.path.join(os.path.dirname(HERE), "AWG-Graph-Handout-v2.docx")
 
 EMAIL = "stefan.muennich@unibas.ch"
 URL = "https://edition.anton-webern.ch"
@@ -101,7 +101,7 @@ def heading(text, new_page=False):
     return para(
         run(text, bold=True, color=TEAL, size=22),
         after=110,
-        before=280,
+        before=220,
         extra=("<w:keepNext/><w:pageBreakBefore/>" if new_page else "<w:keepNext/>")
         + f'<w:pBdr><w:bottom w:val="single" w:color="{GREEN}" w:sz="6" w:space="1"/></w:pBdr>',
     )
@@ -307,7 +307,7 @@ def make_figure():
 
     mark(343, 186, 416.5, 217, red)
     mark(308.5, 186, 331, 207, teal)  # Sk2, row B: f sharp written over g
-    mark(686, 188, 736, 213, teal)  # Sk2.1, bar 2: g struck out, then f sharp
+    mark(686, 188, 736, 213, teal)  # Sk2.1, bar 2: g bracketed (deleted), then f sharp
 
     # Sk2.1 -- Sk2: concomitates, below the excerpt
     ly = TOP + H + 55
@@ -338,7 +338,7 @@ def content():
     # --- question
     B.append(mint_box(
         para(runs("**Question.** How can a digital edition represent non-linear compositional processes – and keep philological claims as open as the evidence demands?", size=18), after=60)
-        + para(runs("**Answer: partly.** `concomitates`, plain `precedes` and a certainty tag keep claims open. Elsewhere openness survives only as free text – readable, not queryable.", size=18), after=0)
+        + para(runs("**A possible answer (from the AWG case).** Relations that do not force one sequence, uncertainty marked on the statement rather than in the relation, and generated and editorially asserted knowledge kept apart. They help in part: what a model has no form for stays in prose – readable, but not queryable.", size=18), after=0)
     ))
 
     # --- 1 the AWG and its graph
@@ -366,31 +366,31 @@ def content():
     B.append(grid_table([3300, 3500, 3406], ["Term", "In the documents", "Class"], [
         ["sketch · Skizze", "Sk1, Sk2, Sk2.1", "`Sketch` ⊂ `Inscription`"],
         ["row table · Reihentabelle", "Webern’s sheet of row forms", "`RowTable` ⊂ `Sketch`"],
-        ["paratext · Paratext", "title, dating, instruments", "`Paratext` ⊂ `Inscription`"],
+        ["paratext · Paratext", "title, dating, instrumentation", "`Paratext` ⊂ `Inscription`"],
         ["version · Textfassung", "TF1, TF2", "`TextVersion`"],
-        ["edition complex · Editionskomplex", "opus or M number", "`EditionComplex`"],
+        ["edition complex · Editionskomplex", "all edition-relevant material of a composition, by opus or M number", "`EditionComplex`"],
         ["uncertainty", "“presumably”", "tag `certainty: uncertain`"],
     ]))
     B.append(note("Not modelled yet: “study composition”, “ink draft”."))
 
     # --- 4 relations
-    B.append(heading("4  Two relations carry the genetic order"))
+    B.append(heading("4  Two relations link inscriptions: a sequence, or mutual influence"))
     B.append(grid_table([2600, 4406, 3200], ["Relation", "Meaning", "cf. CIDOC CRM"], [
         ["`precedes`", "A begun before B, overlap allowed", "P176 “starts before the start of”"],
-        ["`concomitates`", "A and B shape each other, no order", "P174 “starts before the end of”"],
+        ["`concomitates`", "A and B shape each other; which came first cannot be decided", "P174 “starts before the end of” (the overlap, not the influence)"],
         ["`precedesScripture`", "evidence: the writing", ""],
         ["`precedesContent`", "evidence: the musical content", ""],
     ]))
     B.append(note("`precedes` is transitive; `concomitates` is symmetric, not transitive."))
 
     # --- 5 standards
-    B.append(heading("5  Standards serve as alignments, not as the model", new_page=True))
-    B.append(p("**A sketch’s genetic place rests on content and material traces together** – which LRMoo separates (F2 Expression vs. F5 Item).",
+    B.append(heading("5  For now, the model is domain-specific, with links to standards", new_page=True))
+    B.append(p("**Relating sketches draws on content and page together** – which LRMoo separates (F2 Expression vs. F5 Item).",
                size=17, keep=True, after=120))
     B.append(grid_table([3000, 5306, 1900], ["Standard", "In the AWG model", "Link"], [
         ["LRMoo", "edition complex ≈ F1 · version, sketch ≈ F2 · document ≈ F5", "`rdfs:seeAlso`"],
         ["CIDOC CRM", "temporal reading: `precedes` ≈ P176 · `concomitates` ≈ P174", "`rdfs:seeAlso`"],
-        ["DC terms, SKOS, PROV, `rdf:Statement`", "parts · concept schemes · attribution · statements", "used directly"],
+        ["DC terms, SKOS, PROV, `rdf:Statement`", "single terms: parts · concept schemes · attribution · statements", "used directly"],
         ["MEI", "not integrated yet", "–"],
     ]))
 
@@ -398,8 +398,9 @@ def content():
     B.append(heading("6  The model could transfer; the pipeline cannot"))
     B.append(grey_columns([
         ("Portable", ["`Inscription` · `Document` · `Folio` · `Placement`", "`precedes` · `concomitates`"]),
-        ("Tied to the AWG", ["the generator reads the AWG’s own data", "Sk1 before Sk2 is read as `precedes`"]),
+        ("Tied to the AWG", ["the generator reads the AWG’s own data and M numbers", "Sk1 before Sk2 is read as `precedes`, without evidence type"]),
     ]))
+    B.append(note("Transfer to other repertoires is plausible but untested."))
 
     # --- 7 music example
     B.append(heading("7  Example: M 317, sketchbook 3, fol. 38v"))
@@ -410,8 +411,8 @@ def content():
                    "of Sk2 and in bar 2 of Sk2.1. A dashed line below, labelled concomitates, joins Sk2 and Sk2.1."))
     B.append(spacer(after=60))
     B.append(text_columns([
-        ("Sk1 `precedesScripture` Sk2", "The end of Sk2 is squeezed (red): Sk1 was there first."),
-        ("Sk2.1 `concomitates` Sk2", "In both, g gives way to f♯ (green): neither comes first."),
+        ("Sk1 `precedesScripture` Sk2", "The end of Sk2 is squeezed (red): Sk1 already took the space – an order inferred from the writing."),
+        ("Sk2.1 `concomitates` Sk2", "In both, g gives way to f♯ (green): which came first cannot be decided."),
     ]))
     B.append(note("Source: AWG online edition, M 317 Sk2, Sk1, Sk2.1, superimposed (development version, 12 Nov 2026)."))
 
@@ -424,22 +425,22 @@ def content():
     ]))
 
     # --- 9 frictions
-    B.append(heading("9  Where model and data disagree"))
+    B.append(heading("9  Where model and data diverge, each gap is information"))
     B.append(grey_columns([
-        ("Model lags data", ["staves, measures as free text", "no writing instruments"]),
-        ("Data lags model", ["29 Sk## placeholders", "datings without year"]),
+        ("Model lags data", ["staves, measures in their own notation, stored as strings", "no writing instruments yet"]),
+        ("Data lags model", ["sketchbook 3 as two excerpts · 29 Sk## placeholders", "datings without year"]),
     ]))
-    B.append(note("12 generator warnings – each gap is information."))
+    B.append(note("Some gaps are ours to close; others belong to the evidence. The generator reports them: 12 warning rules."))
 
     # --- 10 conclusion
     B.append(heading("10  Conclusion"))
     B.append(bullet("**Layers** show where editorial judgment becomes explicit.", size=18))
-    B.append(bullet("**Warnings** show where the data disagree.", size=18))
+    B.append(bullet("**Warnings** show where the data are open or disagree.", size=18))
     B.append(bullet("**Model and data** are written side by side: concomitant.", size=18))
-    B.append(note("Next: named graphs for ink and pencil layers · persons · archives", after=200))
+    B.append(note("Next: named graphs for ink and pencil layers · persons · archives", after=100))
     B.append(mint_box(
-        para(runs("**For discussion.** Whose genetic order does the graph show – Webern’s or ours?", size=18), after=60)
-        + para(runs("How much of Webern’s compositional process survives translation into formal models?", size=18), after=0)
+        para(runs("**For discussion.** Whose process does the graph show – Webern’s or ours?", size=18), after=60)
+        + para(runs("How much of (Webern’s) compositional processes survives translation into formal models?", size=18), after=0)
     ))
 
 

@@ -23,7 +23,7 @@ from lxml import etree
 from pptx import Presentation
 from pptx.dml.color import RGBColor
 from pptx.enum.dml import MSO_LINE, MSO_THEME_COLOR
-from pptx.enum.shapes import MSO_CONNECTOR, MSO_SHAPE
+from pptx.enum.shapes import MSO_CONNECTOR, MSO_SHAPE, MSO_SHAPE_TYPE
 from pptx.enum.text import MSO_ANCHOR, PP_ALIGN
 from pptx.oxml.ns import qn
 from pptx.util import Cm, Pt
@@ -512,12 +512,31 @@ ELAPSED = [0]
 TOTAL = 25 * 60  # the full 25 minutes slot, no reserve
 
 
-def notes(slide, label, seconds, text):
+def notes(slide, label, seconds, text, alt=None):
     ELAPSED[0] += seconds
     slide.notes_slide.notes_text_frame.text = (
         f"[{label}] Target time: {fmt_time(seconds)} (cumulative {fmt_time(ELAPSED[0])} of {fmt_time(TOTAL)})\n\n"
         + text.strip()
     )
+    if alt:
+        set_alt(slide, alt.strip())
+
+
+def set_alt(slide, descr):
+    """Alt text: on the slide's picture if it has one, else on a group of its diagram shapes."""
+    pics = [sh for sh in slide.shapes if sh.shape_type == MSO_SHAPE_TYPE.PICTURE]
+    if pics:
+        assert len(pics) == 1, [p.name for p in pics]
+        pics[0]._element.nvPicPr.cNvPr.set("descr", descr)
+        return
+    members = [
+        sh
+        for sh in slide.shapes
+        if not sh.is_placeholder and not sh.name.startswith("Watermark")
+    ]
+    group = slide.shapes.add_group_shape(members)
+    group.name = "Diagram"
+    group._element.nvGrpSpPr.cNvPr.set("descr", descr)
 
 
 def title_slide(title, subtitle_lines):
@@ -578,9 +597,9 @@ def slide_01():
     notes(
         s,
         "Title",
-        15,
+        40,
         """
-Thank you for having me. My talk is about the graph of the Anton Webern Gesamtausgabe: where its terms come from, and what happens to them when we encode them as classes and relations.
+Thank you for the kind introduction, and thank you for the invitation, especially since our project, the Anton Webern Gesamtausgabe, is not a genetic edition in the strict sense. But Webern can't be edited without addressing or understanding his complex compositional processes. So, as a word of caution, the "genetic" approach I present is more a pragmatic one, not a fully fledged theory of genetic criticism – I hope it offers some insights nonetheless.
 """,
     )
 
@@ -635,17 +654,20 @@ def slide_02():
     notes(
         s,
         "Research problem",
-        45,
+        90,
         """
-Let me start with the question behind this talk.
+Let me put the talk's question first.
 
 [Pause, let the slide speak.]
 
-Webern's sketches do not form a simple sequence. They overlap and are spread over sketchbooks and loose sheets. A printed edition has to choose one order. That digital editions overcome the linearity of the book is common sense in our community. How to get there is not – and a network model of the process is still rare.
+As we have seen in several papers today already, compositional processes rarely form a linear sequence. Sketches overlap and are spread over sketchbooks and loose sheets; earlier stages of a work may be scattered across manuscripts, places or years. In short, the surviving sources most often form a network of relations.
 
-The harder part is the second half. A graph forces every relation to be explicit: an edge is there, or it is not. Philological claims are often more open than that – "presumably", "alongside", "not decidable". How can the graph keep them that open? That is this talk's question.
+However, editions in a traditional sense, following the page-based linearity of the book, had to choose some order. Digital editions set out to overcome this linearity with hypertextuality. But do they really? Don't we still tend to streamline writing layers and editorial findings into our narratives (a curated "pathway" through the edition as Kepper/Pugin called it some years ago)? Open findings, discarded, overwritten, erased attempts, ruptures or uncertainty remain a challenge for a digital environment that strives for completeness and explicitness.
 
-ALT TEXT: Behind the slide, a pale teal image of the full op. 25 graph: hundreds of nodes and edges without labels. In a dark teal band, the research question in white.
+So: how can a digital edition represent such non-linear processes – in other words, how do we keep open what cannot be finally described or decided, and yet hold it in a formal model? That is this talk's question. As you may have guessed from the slide, our approach to it is a graph-based one.
+""",
+        alt="""
+Behind the slide, a pale teal image of the full op. 25 graph: hundreds of nodes and edges without labels. In a dark teal band, the research question in white.
 """,
     )
 
@@ -766,11 +788,12 @@ def slide_03():
         "The AWG and its graph",
         45,
         """
-Online, the AWG also provides an RDF graph as a semantic view of these materials.
+In its online edition, the AWG adds the graph as a semantic view of these materials. In its current state, which is still in development (and unfortunately not publicly available yet), it combines two layers. One layer is automatically generated from the edition's structured data: hierarchy, sources, folios, placements, and relations that follow from the sketch sigla numbering. A curated layer holds what only editors can assert: evidence-based order, or uncertainty.
 
-The graph has two layers. The generated layer is derived from the edition's structured data: hierarchy, sources, folios, placements, and relations that follow from the numbering. The curated layer holds what only editors can assert: continuity drafts, evidence-based order, and uncertainty.
-
-Both are described by one draft ontology, version 0.1. You can query it with SPARQL and export it as Turtle. There is no reasoning: everything was either generated or asserted.
+Both layers are described by one RDF ontology which together with the data can be queried with SPARQL and exported as Turtle.
+""",
+        alt="""
+A frame labelled draft ontology v0.1, with the edition URL edition.anton-webern.ch at its top right. Inside, two stacked layers, each with a small graph: the generated layer, derived from the edition's structured data, and the curated layer, hand-modelled editorial assertions. Below: queried with SPARQL in the app, exported as Turtle. No reasoning.
 """,
     )
 
@@ -798,7 +821,7 @@ OP25_PANELS = [
     (
         "op25-graph-both-canvas.png",
         "both",
-        "the chain crosses the opus order",
+        "the difference: editorial judgment",
         (261, 161, 2845, 2567),  # bottom edge cuts off the app toolbar
         [(1266, 1307, 442, 75, -21.0)],
     ),  # M321 Sk9 → M322 Sk1
@@ -810,31 +833,34 @@ OP25_TITLES = [
 ]
 OP25_NOTES = [
     (
+        35,
+        """
+So to give you an example upfront, this is the graph view of Webern's op. 25 (Three songs after poems by Hildegard Jone), with the catalogue numbers M 317, M 322 and M 321 standing for these three songs.
+
+In the automatically generated layer, you can see the three "islands", one per song, ordered by numbering of their sketches. The row table is there [red mark], but without any genetic relation.
+""",
+        """
+Screenshot of the graph view of op. 25, generated layer: three separate clusters of nodes, one per song; a red ellipse marks the row table node without genetic relations. Beside it, the three steps, step 1 highlighted: generated – three “islands”, one per song.
+""",
+    ),
+    (
         30,
         """
-This is the graph of op. 25, filtered to the edition complexes and the main sketches. In the AWG, op. 25 is a composite edition complex: M 317, M 322 and M 321, in the order of the opus.
-
-First, the generated layer: what follows from the edition data alone. Three “islands”, one per song, ordered by numbering. The row table is there [red mark], but without any genetic relation.
-
-ALT TEXT: Screenshot of the graph view of op. 25, generated layer: three separate clusters of nodes, one per song; a red ellipse marks the row table node without genetic relations. Beside it, the three steps, step 1 highlighted: generated – three “islands”, one per song.
+In the curated layer, the editors' assertions add a connection [red marks] from M 317 Sk4 to M 321 Sk1, then M 321 Sk9 to M 322 Sk1. Webern sketched the third song of the opus, M 321, before the second, M 322 – together with the row table, which is now part of many more relations.
+""",
+        """
+Screenshot of the graph view of op. 25, curated layer: one connected chain; red ellipses mark the links from M 317 Sk4 to M 321 Sk1 and from M 321 Sk9 to M 322 Sk1. Beside it, the three steps, step 2 highlighted: curated – one chain across the songs.
 """,
     ),
     (
-        20,
+        30,
         """
-Second, the curated layer: the editors' assertions. Look at the chain [red marks]: M 317, then M 321, then M 322. Webern sketched the third song before the second – together with the row table.
+When we combine both layers, the "islands" are still there: within each song, the numbering already gives an order. The connection across the songs [red mark] is what only the curated layer brings in. That difference is where the editorial judgment becomes explicit – and the laboratory for the rest of this talk.
 
-ALT TEXT: Screenshot of the graph view of op. 25, curated layer: one connected chain; red ellipses mark the links from M 317 Sk4 to M 321 Sk1 and from M 321 Sk9 to M 322 Sk1. Beside it, the three steps, step 2 highlighted: curated – one chain across the songs.
+[Not spoken: the screenshots come from the app's graph view, filtered with the SPARQL query in build/op25-demo-query.rq.]
 """,
-    ),
-    (
-        25,
         """
-Third, both layers together. The chain cuts across the opus order [red mark]. That is where editorial judgment becomes explicit – and the laboratory for the rest of this talk.
-
-(The screenshots come from the app's graph view, filtered with the SPARQL query in build/op25-demo-query.rq.)
-
-ALT TEXT: Screenshot of the graph view of op. 25, both layers; a red ellipse marks the link from M 321 Sk9 to M 322 Sk1, against the opus order. Beside it, the three steps, step 3 highlighted: both – the chain crosses the opus order.
+Screenshot of the graph view of op. 25, both layers; a red ellipse marks the link from M 321 Sk9 to M 322 Sk1, against the opus order. Beside it, the three steps, step 3 highlighted: both – the difference: editorial judgment.
 """,
     ),
 ]
@@ -924,8 +950,8 @@ def op25_slide(idx):
         ],
         "Source line",
     )
-    seconds, text = OP25_NOTES[idx]
-    notes(s, f"Graph view: op. 25 ({idx + 1}/3)", seconds, text)
+    seconds, text, alt = OP25_NOTES[idx]
+    notes(s, f"Graph view: op. 25 ({idx + 1}/3)", seconds, text, alt)
 
 
 def slide_04_generated():
@@ -960,20 +986,20 @@ def slide_05():
         (
             "paratext",
             "Paratext",
-            "title, dating, instruments: the categories of the source descriptions",
+            "title, dating, instrumentation: the categories of the source descriptions",
         ),
         (
             "row table",
             "Reihentabelle",
-            "Webern's sheet of row forms, a source of its own in op. 25",
+            "Webern's sheet of row forms",
         ),
         (
             "edition complex",
             "Editionskomplex",
-            "what is edited together, named by opus or M number",
+            "all edition-relevant material of a composition, by opus or M number",
         ),
     ]
-    x0, y0, gap, h = 0.93, 4.6, 0.4, 7.4
+    x0, y0, gap, h = 0.93, 4.6, 0.4, 7.0
     w = (32.0 - 4 * gap) / 5
     for i, (term, german, origin) in enumerate(cards):
         x = x0 + i * (w + gap)
@@ -989,56 +1015,54 @@ def slide_05():
             f"Card text: {term}",
         )
 
-    # strip: op. 25 as composite edition complex, parts in opus order
-    sy, sh = 13.2, 1.5
-    add_text(
-        s,
-        x0,
-        sy,
-        4.2,
-        sh,
-        [("sub", "op. 25 =")],
-        "Strip label",
-        anchor=MSO_ANCHOR.MIDDLE,
-    )
-    for i, (m, song) in enumerate([("M 317", "I"), ("M 322", "II"), ("M 321", "III")]):
-        bx = x0 + 3.6 + i * 5.6
-        labelled_box(s, bx, sy, 5.0, sh, m, f"Strip: {m}", style="bold", fill=T_MINT)
+    # case row: each category as it occurs in op. 25, one box under each card
+    cy, ch = 13.0, 3.3
+    add_text(s, x0, cy - 0.95, 8.0, 0.7, [("sub", "in op. 25")], "Case label")
+    nb = lambda t: t.replace(" ", " ").replace("–", "⁠–⁠")  # no break in "M 317", "Sk1–4"
+    cases = [
+        (
+            "sketch",
+            f"{nb('M 317 Sk1–4')}, {nb('M 321 Sk1–9')}, {nb('M 322 Sk1–4')}, with sub-sketches",
+        ),
+        ("version", f"{nb('M 317 TF2')}, {nb('M 322 TF1')}, {nb('M 321 TF1')}"),
+        (
+            "paratext",
+            f"title, datings ({nb('4. VII. 34')}), paginations, instrumentations",
+        ),
+        ("row table", f"one sheet, written alongside {nb('M 321 Sk1–9')}"),
+        (
+            "edition complex",
+            f"composite: {nb('M 317')}, {nb('M 322')}, {nb('M 321')} (songs {nb('I–III')})",
+        ),
+    ]
+    for i, (term, text) in enumerate(cases):
+        x = x0 + i * (w + gap)
+        rect(s, x, cy, w, ch, f"Case box: {term}", line=T_MINT, line_pt=1.5)
         add_text(
             s,
-            bx,
-            sy + sh + 0.25,
-            5.0,
-            0.6,
-            [("caption", f"song {song}")],
-            f"Strip caption: {m}",
-            align=PP_ALIGN.CENTER,
+            x + 0.5,
+            cy,
+            w - 1.0,
+            ch,
+            [("caption", text)],
+            f"Case text: {term}",
+            anchor=MSO_ANCHOR.MIDDLE,
         )
-    add_text(
-        s,
-        x0 + 3.6 + 3 * 5.6 + 0.4,
-        sy,
-        10.0,
-        sh,
-        [
-            ("caption", "a composite edition complex:"),
-            ("caption", "parts in the order of the opus"),
-        ],
-        "Strip note",
-        anchor=MSO_ANCHOR.MIDDLE,
-    )
     notes(
         s,
         "Terms from the material",
-        90,
+        95,
         """
-Where do the terms of the model come from? Not from a theory of genetic criticism, but from the documents themselves: Webern's manuscripts and the source descriptions of the AWG.
+Before we look into Webern's sketches, let me take a few minutes for the model behind this graph: its terms, its classes, its relations, and how it relates to formal standards.
 
-A sketch is what the editors number in the source description: Sketch 1, Sketch 2, and Sketch 2.1 for a sub-sketch. A version – in German "Textfassung" – is a recognisable state of a song, numbered TF1, TF2. Paratexts are everything on the page that accompanies the music: title, dating, pagination, instrument indications – again the categories of the source descriptions. The row table is Webern's own sheet with the forms of the twelve-tone row; in op. 25 it is a source of its own. And the edition complex is the unit the AWG edits together, named after an opus or an M number from Moldenhauer's catalogue.
+So, where do the terms of the model come from? Not from a theory of genetic criticism, but from editorial practice: they name what the editors find in Webern’s documents, as recorded in the AWG’s source descriptions.
 
-Op. 25 shows how these units nest: one composite complex with three parts, M 317, M 322 and M 321, in the order of the opus. As the graph view showed, the sketches follow another order.
+A sketch is a unit of writing the editors identify on the page and number: Sketch 1, Sketch 2, and Sketch 2.1 for a sub-sketch. A version – the Textfassung from before – is a state of the musical text, numbered TF1, TF2. Paratexts are everything on the page that accompanies the music: title, dating, pagination, also instrumentations if not the same complex. The row table is Webern’s own sheet with the forms of the twelve-tone row – and, as the graph view showed, part of Webern's compositional process. The edition complex comprises everything relevant to an edition of a composition – single, or composite like op. 25. It is named by opus number or by M number from Hans Moldenhauer’s catalogue.
 
-ALT TEXT: Five cards in a row – sketch, version, paratext, row table, edition complex – each with its German term and one line on where it comes from in the documents. Below, a strip: op. 25 equals M 317, M 322, M 321, songs I to III.
+Below each term, you see how it occurs in op. 25 – the example from the graph view.
+""",
+        alt="""
+Five cards in a row – sketch, version, paratext, row table, edition complex – each with its German term and one line on where it comes from in the documents. Below each card, under the heading "in op. 25", a framed box with the case: sketches M 317 Sk1–4, M 321 Sk1–9, M 322 Sk1–4 with sub-sketches; versions M 317 TF2, M 322 TF1, M 321 TF1; paratexts such as the title, datings (4. VII. 34), paginations, instrumentations; the row table, one sheet written alongside M 321 Sk1–9; the edition complex, composite of M 317, M 322, M 321 (songs I–III).
 """,
     )
 
@@ -1160,15 +1184,18 @@ def slide_06():
     notes(
         s,
         "From term to class",
-        60,
+        85,
         """
-The next step turns these terms into classes. The superclass is Inscription: everything written on a document that we place in a genetic order. Sketch and Paratext are its subclasses – so a dating can stand in a genetic chain just like a sketch. Under Sketch there are two more specific classes: the row table and the continuity draft. The three forms of edition become classes as well, under EditedMusicText, each linked by "edits" to a TextVersion or a Sketch.
+In the source descriptions, these terms are used as editors use them: flexibly, and explained in prose. A graph needs more. It has to say what belongs to a category, and how the categories relate to each other. So each term becomes a class.
 
-Uncertainty is not a relation of its own. An earlier draft had a relation "concomitates unsure". Now an editorial statement carries a small tag: certainty uncertain. Without the tag, the statement counts as certain.
+The first question was: what do a sketch and a paratext have in common? Both are written on a page, and both have a place in the compositional process – a title or a dating is written at some point, too. So the superclass is Inscription: everything written on a document that we can place in that process. Sketch and Paratext are its subclasses. Under Sketch, there are two more specific classes: the row table and the continuity draft.
 
-And some terms of the edition have no class yet: "study composition" and "ink draft".
+Uncertainty is not a relation of its own. An earlier draft had a relation "concomitates unsure". Now an editorial statement carries an uncertainty tag: certainty, uncertain. Without the tag, the statement counts as certain.
 
-ALT TEXT: Class diagram. Inscription is the superclass of Sketch and Paratext; Sketch has the subclasses RowTable and ContinuityDraft. On the right, a statement "A precedes B" in a dashed frame, with a red tag "certainty: uncertain" hanging from it. Footnote: study composition and ink draft are not modelled yet.
+Some terms of the edition have no class yet like "study composition" and "ink draft", but we are in the process of including them.
+""",
+        alt="""
+Class diagram. Inscription is the superclass of Sketch and Paratext; Sketch has the subclasses RowTable and ContinuityDraft. On the right, a statement "A precedes B" in a dashed frame, with a red tag "certainty: uncertain" hanging from it. Footnote: study composition and ink draft are not modelled yet.
 """,
     )
 
@@ -1266,15 +1293,18 @@ def slide_02_editions():
     notes(
         s,
         "The AWG and its editions",
-        60,
+        80,
         """
-First, a word on the edition itself. The AWG is a historical-critical complete edition of Webern's compositions, in print and online. It distinguishes three forms of edition – depending on how the sources have come down to us, and on what users need.
+But first, a word on the edition project itself. The Anton Webern Gesamtausgabe is a historical-critical complete edition of Anton Webern's compositions, in print and online. It distinguishes three forms of edition, depending on how the sources have come down to us and on the intended usage: work, text and sketch editions.
 
-Work editions present the versions that were published during Webern's lifetime or intended for publication: op. 1 to 31 and his arrangements. Text editions present versions that go beyond a sketch but were not concluded in print: compositional studies in ink, fragments, earlier versions of later works. Sketch editions present diplomatic transcriptions of the sketches, usually written in pencil.
+Work editions present the versions published in Webern's lifetime or intended for publication: op. 1 to 31, and his arrangements of other composers' works. Text editions present versions that go beyond a sketch but were not concluded in print: study compositions, fragments, earlier versions of published works. Both edit a version of the musical text – in German, a "Textfassung". A version is not a document: it is a state of the musical text, attested by one or more sources.
 
-Work and text editions edit a version of the musical text – in German, a Textfassung. A version is not a document: it is a state of the musical text, attested by one or more sources. Sketch editions edit the sketches themselves.
+Sketch editions edit Webern's sketches – mostly in pencil, and most often, but not always, connected to a Textfassung.
 
-ALT TEXT: Three cards in a row: work editions (Werkeditionen) – published or intended for print, op. 1–31; text editions (Texteditionen) – beyond a sketch, not concluded in print; sketch editions (Skizzeneditionen) – diplomatic transcriptions, mostly pencil. Arrows labelled "edit" lead from the first two cards to a dashed box "versions of the musical text (Textfassungen)", captioned "a state of the musical text, attested by one or more sources", and from the third card to a box "sketches (Skizzen)".
+The three forms also differ in detail and standardisation: sketch editions come close to diplomatic transcription; work editions standardise most, towards a performable score.
+""",
+        alt="""
+Three cards in a row: work editions (Werkeditionen) – published or intended for print, op. 1–31; text editions (Texteditionen) – beyond a sketch, not concluded in print; sketch editions (Skizzeneditionen) – diplomatic transcriptions, mostly pencil. Arrows labelled "edit" lead from the first two cards to a dashed box "versions of the musical text (Textfassungen)", captioned "a state of the musical text, attested by one or more sources", and from the third card to a box "sketches (Skizzen)".
 """,
     )
 
@@ -1324,7 +1354,7 @@ def slide_09_m307():
                 "body",
                 "four voices, three voices, voice and piano – row variants in between",
             ),
-            ("sub", "across the folios"),
+            ("sub", "across the pages"),
             (
                 "body",
                 "sketches of fol. 3v, 4v and 5r, ordered across the groups of scoring",
@@ -1334,16 +1364,6 @@ def slide_09_m307():
         ],
         "Text: what the graph shows",
         space_after=8,
-    )
-    add_text(
-        s,
-        tx,
-        fy + fh - 1.0,
-        tw,
-        1.0,
-        [("caption", "dotted: the same two relations, held as uncertain")],
-        "Caption: dotted lines",
-        anchor=MSO_ANCHOR.BOTTOM,
     )
     add_text(
         s,
@@ -1363,24 +1383,25 @@ def slide_09_m307():
     notes(
         s,
         "Exploring the graph: M 307",
-        75,
+        85,
         """
-A second example, from an earlier stage of this work: M 307, from July 1930. Here the process is far less tidy than in op. 25.
+A second example, from the beginnings of our work with the idea of graphs: a sketch graph of M 307, which we drew by hand in 2019. Here the process is even less linear than in op. 25.
 
-Webern starts for four voices [top band], tries out row variants [left], changes to three voices [middle], and ends with voice and piano [bottom right]. He keeps reordering – and in the end he abandons the piece.
+Webern had not settled the scoring: He starts for four voices [top band], tries out row variants [left], changes to three voices [middle], and ends with voice and piano [bottom right]. He keeps reordering – and in the end he abandons the piece.
 
-On paper, these sketches are spread over three folios, and their order is anything but obvious. As a graph, the process becomes something you can place: you see which sketch leads where, across the changes of scoring, and where the order stays open. The dotted lines are the same two relations, precedes and concomitates, held as uncertain.
+On paper, these sketches are spread over three pages, and their order is anything but obvious – even if you took the numbering as chronological order, it would not tell you which sketch belongs to which scoring. As a graph, the process becomes something you can place: you see which sketch leads where, across the changes of scoring, and where the order stays open.
 
-For us as editors, that was the point of drawing it: it made a process we could not yet describe in words graspable – and it showed us what a model would have to hold.
-
-ALT TEXT: Left, a genetic graph of M 307, drawn by hand in a slide program in 2019. Coloured boxes for the sketches Sk1 to Sk8 and their sub-sketches sit in four tinted groups: for 4 voices, row variants, for 3 voices, for 1 voice and piano. A legend gives box colours for fol. 3v, 4v and 5r, and three line types: concomitates (double arrow), precedes (arrow), probably (dotted). Two datings, 7. Juli [1930] and 9. VII[.] 1930. Right, three short points: the scoring shifts – four voices, three voices, voice and piano, row variants in between; across the folios – sketches of fol. 3v, 4v and 5r, ordered across the groups of scoring; for the editors – a way into a process that Webern finally abandoned. Below: dotted, the same two relations, held as uncertain.
+For our editors, that was the point of drawing it: it made a process we could not yet describe in words graspable – and it showed us what a model would have to hold.
+""",
+        alt="""
+Left, a genetic graph of M 307, drawn by hand in a slide program in 2019. Coloured boxes for the sketches Sk1 to Sk8 and their sub-sketches sit in four tinted groups: for 4 voices, row variants, for 3 voices, for 1 voice and piano. A legend gives box colours for fol. 3v, 4v and 5r, and three line types: concomitates (double arrow), precedes (arrow), probably (dotted). Two datings, 7. Juli [1930] and 9. VII[.] 1930. Right, three short points: the scoring shifts – four voices, three voices, voice and piano, row variants in between; across the pages – sketches of fol. 3v, 4v and 5r, ordered across the groups of scoring; for the editors – a way into a process that Webern finally abandoned. Below: dotted, the same two relations, held as uncertain.
 """,
     )
 
 
 def slide_07():
     s = content_slide(
-        "Two relations carry the genetic order: a sequence, or mutual influence",
+        "Two relations link inscriptions: a sequence, or mutual influence",
         "Genetic relations",
         watermark=False,
     )
@@ -1530,19 +1551,18 @@ def slide_07():
     notes(
         s,
         "Genetic relations",
-        105,
+        100,
         """
-Two relations carry the genetic order.
+Inscriptions placed in the process need relations between them. The model has two – precedes and concomitates.
 
-"precedes" marks an order that can be ascribed: the evidence shows that A was begun before B. It says nothing about the end – overlap is allowed. This is deliberate: Webern often went back to an earlier sketch while he was working on a later one. The relation is transitive.
+"precedes" marks a temporal order that the evidence supports: A was started before B. It says nothing about the end – overlap is allowed, because Webern often went back to an earlier sketch while working on a later one. The relation is transitive. (Cf. CIDOC CRM's P176 "starts before the start of")
 
-"concomitates" is a different kind of statement. The source shows that A and B were written side by side and shaped each other – a change in one is taken up in the other, and back again. Which of the two came first cannot be decided, and the relation does not pretend otherwise. So it records the mutual influence instead of inventing an order. And it is a claim about timing as well: to shape each other, A and B must have been worked on in a common time range – they overlap. It is symmetric, and it is not transitive.
+"concomitates" is a different kind of statement. A and B were written alongside each other, and each shaped the other: a change in one is taken up in the other. Which came first cannot be decided – so the relation records the influence instead of marking an order. It implies overlap in time; it is symmetric, and not transitive. (Cf. CIDOC CRM's P174 "starts before the end of")
 
-For precedes, the model can also record the kind of evidence. precedesScripture rests on the writing: position on the page, overlay, writing instruments, layers of correction. precedesContent rests on the music: the later inscription takes over changes made in the earlier one. In op. 25, the editors assert precedesScripture between Sketches 1 and 2 of M 317 – you will see it later – and precedesContent between Sketches 2 and 3. Plain precedes leaves the evidence open.
-
-For those who know CIDOC CRM: precedes is close to P176, "starts before the start of". For concomitates, P174, "starts before the end of", captures the overlap in time – but not the influence, the other half of the relation. So these are analogies, linked with seeAlso, not equivalences – more on that next.
-
-ALT TEXT: Two timeline panels. Left, "precedes": bar A starts before bar B, the bars overlap; red dashed lines mark the two starts. Right, "concomitates": bar A lies within bar B, a red frame marks the overlap and a vertical red double arrow between the bars, labelled "mutual influence", shows that each shapes the other. Captions: precedes – an order can be shown, A begins before B, overlap allowed; concomitates – A and B influence each other, which came first cannot be decided. CRM analogies: P176, and P174 (the overlap, not the influence). Below, two labels: precedesScripture (page, overlay, writing instruments) and precedesContent (musical content).
+For precedes, the model can also record the kind of evidence. precedesScripture rests on the writing: position on the page, overlay, writing instruments, layers of correction. precedesContent rests on the musical content: the later inscription takes over changes made in the earlier one. In op. 25, the editors assert precedesScripture between Sketches 1 and 2 of M 317 – you will see it on the page – and precedesContent between Sketches 2 and 3. Plain precedes leaves the evidence open.
+""",
+        alt="""
+Two timeline panels. Left, "precedes": bar A starts before bar B, the bars overlap; red dashed lines mark the two starts. Right, "concomitates": bar A lies within bar B, a red frame marks the overlap and a vertical red double arrow between the bars, labelled "mutual influence", shows that each shapes the other. Captions: precedes – an order can be shown, A begins before B, overlap allowed; concomitates – A and B influence each other, which came first cannot be decided. CRM analogies: P176, and P174 (the overlap, not the influence). Below, two labels: precedesScripture (page, overlay, writing instruments) and precedesContent (musical content).
 """,
     )
 
@@ -1605,9 +1625,9 @@ def slide_07_page():
     )
 
     # legend band (Vorlage p. 7: main colour, bottom left, from the slide edge);
-    # lower than in the Vorlage and nearly opaque, so that it covers only the
-    # empty margin below system 16 and stays legible over the facsimile
-    bw, by = 22.4, SLIDE_H - 0.94
+    # floating at about the height of system 15 (user's wish: not glued to the
+    # bottom edge), nearly opaque so that it stays legible over the facsimile
+    bw, by = 22.4, 16.1
     lb = rect(s, 0.0, by, bw, 0.94, "Band: legend", fill=T_MINT)
     set_alpha(lb._element.spPr, 90)
     add_text(
@@ -1636,15 +1656,16 @@ def slide_07_page():
     notes(
         s,
         "Overview: fol. 38v",
-        45,
+        60,
         """
-Now to the material itself. Here is a whole page: folio 38 verso of Webern's third sketchbook, with the first sketches for "Wie bin ich froh!". The boxes and numbers are ours: the AWG distinguishes fifteen sketches on this one page.
+So much for the model – now to Webern’s sketches. This is folio 38 verso of his third sketchbook, with the first sketches for "Wie bin ich froh!" M 317, the first song of op. 25. The boxes and numbers are ours: the AWG distinguishes fifteen sketches on this one page.
 
-They do not follow the reading order. Sk2 stands to the left of Sk1, Sk2.1 to the right of both; Sk3 and its variants fill the space below. And the page holds more than music: a title, a dating, a page number, instrument indications – the paratexts, dotted here.
+They do not follow the reading order. And the page holds more than musical content, namely the paratexts, dotted here – a title, a dating, a page number. One layer of the paratexts even belongs to another work: at the top, Webern had prepared the systems for the Concerto for Nine Instruments, op. 24 – and then sketched op. 25 into them.
 
-On the next slide, we zoom in on the top three systems [red dashed frame].
-
-ALT TEXT: Full-picture slide. In the centre, over the full height, the facsimile of sketchbook 3, folio 38 verso, sixteen systems, with boxes and labels for the sketches Sk1 to Sk4.1 and dotted boxes for the paratexts; a red dashed frame marks systems 1 to 3. In a mint band at the bottom left: sketchbook 3, fol. 38v, sketches for op. 25/1 (M 317), markings by the AWG. Vertically along the right edge of the image: © Paul Sacher Stiftung, Basel, Sammlung Anton Webern.
+Let's dive into the top three systems [red dashed frame].
+""",
+        alt="""
+Full-picture slide. In the centre, over the full height, the facsimile of sketchbook 3, folio 38 verso, sixteen systems, with boxes and labels for the sketches Sk1 to Sk4.1 and dotted boxes for the paratexts; a red dashed frame marks systems 1 to 3. In a mint band at the bottom left: sketchbook 3, fol. 38v, sketches for op. 25/1 (M 317), markings by the AWG. Vertically along the right edge of the image: © Paul Sacher Stiftung, Basel, Sammlung Anton Webern.
 """,
     )
 
@@ -1789,14 +1810,14 @@ def slide_07_example():
                 "precedesScripture",
                 " Sk2",
                 "The right end of Sk2 is squeezed together (red): "
-                "Sk1 already took the space. The writing alone gives the order.",
+                "Sk1 already took the space. An order inferred from the writing.",
             ),
             (
                 "Sk2.1 ",
                 "concomitates",
                 " Sk2",
                 "In both, g gives way to f♯ (green): Sk2.1 and row B of Sk2 "
-                "shape each other. Neither comes first.",
+                "shape each other. Which came first cannot be decided.",
             ),
         ]
     ):
@@ -1829,19 +1850,20 @@ def slide_07_example():
     notes(
         s,
         "Example: M 317",
-        90,
+        140,
         """
-Here are both relations on one page of Webern's sketchbook: the first sketches for "Wie bin ich froh!", the first song of op. 25, dated 4 July 1934. What you see is the AWG's diplomatic transcription of folio 38v, systems 1 to 3. The edition gives each sketch on its own sheet; here I have put three of them back on the page together.
+Here are the top three systems in the AWG's diplomatic transcription. Normally, the edition gives each sketch on its own sheet; here I have put three of them back on one page together.
 
-[Point to Sk1.] In the middle, Sk1: a four-note figure – the opening of the voice part.
+[Point to Sk1.] In the middle, Sk1: a four-note figure, the opening of the voice part, in a first draft, deleted by a hook.
 
-[Point to Sk2.] To its left, Sk2: a twelve-tone row, in two attempts. Why does Sk1 come first, although it stands to the right? Look at the right end of Sk2 [red mark]: the writing is squeezed together. Sk2 ran into the space that Sk1 already occupied. That is precedesScripture: an order from the writing alone. On this page, the order runs from right to left.
+[Point to Sk2.] To its left, Sk2: a twelve-tone row, in two attempts. The first, row A, breaks off after five notes; another hook marks it as deleted. Row B completes the row. Why does Sk1 come first, although it stands to the right? Look at the right end of Sk2 [red mark]: the writing is squeezed together. Sk2 ran into the space that Sk1 already occupied. That is, in our terminology, precedesScripture: an order from the writing.
 
-[Point to Sk2.1.] On the right, Sk2.1 turns the rhythm of Sk1 into a melody with text, and its last layer articulates row B of Sk2. The commentary says that row B was written "in dynamic alignment" with Sk2.1 and its variants. You can see it in one note [green marks]: in bar 2 of Sk2.1, Webern strikes out the g and goes on with f sharp; in row B of Sk2, he writes f sharp over the g – the grey note is the overwritten one. The same decision, in both places. Each shaped the other; neither came first. That is concomitates.
+[Point to Sk2.1.] On the right, Sk2.1 turns the row of Sk2, in the rhythm of Sk1, into a melody with text. The commentary says that row B of Sk2 was written "in dynamic alignment" with Sk2.1 and its variants. You can see it in one note [green marks]: in bar 2 of Sk2.1, Webern brackets the g – a sign for its deletion – and goes on with f sharp; in row B, he writes f sharp over the g – the grey note is the overwritten one. The same decision, in both places. Each shaped the other; it cannot be decided which came first. In the model, that is concomitates.
 
-So one page holds both: an order the writing proves, and an exchange that no order captures. Even the dating "4. VII. 34" is modelled this way: it concomitates with Sk1 and with Sk2, because the editors cannot say with which of the two it was written.
-
-ALT TEXT: The diplomatic transcription of M 317, folio 38v, systems 1 to 3, across the slide. Labels above system 1 mark three sketches from left to right: Sk2, Sk1, Sk2.1. An arrow labelled precedesScripture points from Sk1 to Sk2, that is, from right to left. A red rectangle marks the crowded right end of Sk2. Two green rectangles mark where g gives way to f sharp: in row B of Sk2 (f sharp written over a grey g) and in bar 2 of Sk2.1 (g struck out, followed by f sharp). Below the excerpt, a dashed line labelled concomitates connects Sk2.1 and Sk2. Two text blocks: Sk1 precedesScripture Sk2 – the right end of Sk2 is squeezed together, Sk1 already took the space, the writing alone gives the order; Sk2.1 concomitates Sk2 – in both, g gives way to f sharp (green), Sk2.1 and row B of Sk2 shape each other, neither comes first.
+So one page holds both: an order inferred from the writing, and an exchange that no order captures. Even the dating, 4 July 1934, is modelled this way: it concomitates with Sk1 and with Sk2, because the editors cannot say with which of the two it was written.
+""",
+        alt="""
+The diplomatic transcription of M 317, folio 38v, systems 1 to 3, across the slide. Labels above system 1 mark three sketches from left to right: Sk2, Sk1, Sk2.1. An arrow labelled precedesScripture points from Sk1 to Sk2, that is, from right to left. A red rectangle marks the crowded right end of Sk2. Two green rectangles mark where g gives way to f sharp: in row B of Sk2 (f sharp written over a grey g) and in bar 2 of Sk2.1 (g struck out, followed by f sharp). Below the excerpt, a dashed line labelled concomitates connects Sk2.1 and Sk2. Two text blocks: Sk1 precedesScripture Sk2 – the right end of Sk2 is squeezed together, Sk1 already took the space, an order inferred from the writing; Sk2.1 concomitates Sk2 – in both, g gives way to f sharp (green), Sk2.1 and row B of Sk2 shape each other, which came first cannot be decided.
 """,
     )
 
@@ -1860,9 +1882,9 @@ def slide_09():
             [
                 ("code", "Inscription", "what is written and ordered"),
                 ("code", "Document", "the physical object"),
-                ("code", "Folio", "one page side"),
-                ("code", "Placement", "where on the page: staves, measures"),
-                ("code", "precedes", "genetic order, overlap allowed"),
+                ("code", "Folio", "one leaf (recto and verso)"),
+                ("code", "Placement", "where on recto or verso: staves, measures"),
+                ("code", "precedes", "temporal sequence, overlap allowed"),
                 ("code", "concomitates", "mutual influence, no order"),
             ],
         ),
@@ -1944,17 +1966,18 @@ def slide_09():
     notes(
         s,
         "What transfers",
-        150,
+        90,
         """
-What of this model would transfer to other editions? I would separate two things.
+What of this would transfer to other editions? Domain-specific does not mean Webern-specific. I would separate two things.
 
-Portable is the core of the model. Inscription, Document, Folio and Placement describe what is written where: on which object, on which page side, on which staves and measures. And the two genetic relations describe order without forcing a single line: precedes, with its two subproperties, for sequence, and concomitates for inscriptions written side by side. None of this is specific to Webern. Any edition of sketches and drafts needs the same distinctions. Placement, for instance, is a node of its own between an inscription and a page side: it records staves and measures for each page, so that one sketch can run across several pages without losing its place on any of them.
+Ideally, the core is portable. Inscription, Document, Folio and Placement describe what is written where: on which object, which leaf and which side, which staves and measures. Placement is a node of its own, so that one sketch can run across several pages and keep its place on each. And the two relations link inscriptions – with branches and parallels, not one sequence. Editions of sketches and drafts will likely come back to these distinctions in one way or another.
 
-Tied to the AWG is the pipeline. The generator reads the edition's own data: its source descriptions, its sheet IDs, its numbering conventions. Another edition would need its own generator, or would have to bring its data into the same shape. The same holds for the Moldenhauer catalogue. M numbers name our edition complexes. That works for Webern because Moldenhauer catalogued the estate, including the unfinished pieces. Other repertoires have other catalogues, or none. And the numbering conventions are an even deeper tie. The generator reads the numbering as a genetic process: Sketch 1 precedes Sketch 2, and the sub-sketch 2.1 concomitates with Sketch 2. A label becomes a genetic claim. Often that is right, because editors number in genetic order – but it is a claim all the same, without any evidence type, and a convention of the AWG's editors, not of genetic criticism in general. Even within the AWG, the pipeline knows nothing about relations across complexes; those come only from curation.
+Tied to the AWG is the pipeline. The generator reads the edition’s own data: source descriptions, sheet IDs, and M numbers from Moldenhauer’s work catalogue. And it reads numbering as process: Sketch 1 precedes Sketch 2, Sketch 2.1 concomitates with Sketch 2. That is often right – but it remains our convention, and a claim without explicitly modelled evidence type. Relations across complexes come only from curation.
 
-So the honest statement is the one at the bottom: transfer to other repertoires is plausible, but untested. We have not yet modelled another composer's sketches. I would be very interested to hear whether these classes fit the material you work on.
-
-ALT TEXT: Two columns. Left, "portable": Inscription, Document, Folio, Placement, precedes and concomitates, each with a short gloss. Right, "tied to the AWG": the pipeline, the Moldenhauer catalogue, and the numbering conventions – Sk1 before Sk2 is read as precedes, without evidence type. Bottom line: transfer to other repertoires is plausible but untested.
+So, as the bottom line says: transfer is plausible, but untested. I would be very interested to hear whether these classes fit the material you work on.
+""",
+        alt="""
+Two columns. Left, "portable": Inscription, Document, Folio, Placement, precedes and concomitates, each with a short gloss. Right, "tied to the AWG": the pipeline, the Moldenhauer catalogue, and the numbering conventions – Sk1 before Sk2 is read as precedes, without evidence type. Bottom line: transfer to other repertoires is plausible but untested.
 """,
     )
 
@@ -2177,26 +2200,27 @@ def slide_09_explore():
     notes(
         s,
         "Exploring the graph: M 317",
-        90,
+        110,
         """
-What does the graph add to the commentary? Not new facts – everything here was asserted by the editors. But it shows them differently. Three things, back on the first sketches of M 317.
+What does the graph add to the critical commentary? Not new facts – everything here was asserted by the editors. But it shows them differently. Three things, back on the first sketches of M 317.
 
-Clusters. Sk2.1 and its variants all concomitate – with Sk2.1, and through it with Sk2. In the commentary, that is five separate entries, each saying "in dynamic alignment with". In the graph it is one shape [point to the shaded area]: a work phase you see at a glance.
+Clusters. Sk2.1 and its variants all concomitate – with Sk2.1, and through it with Sk2. In the commentary, that is five separate entries, each saying "in dynamic alignment with". In the graph it is one cluster [point to the shaded area]: a compositional work phase at a glance.
 
-Paths. The precedes chain runs from Sk1 through Sk4 – and then on into M 321, the third song. The order of work leaves the song, as we saw in the graph of op. 25. You follow a path; you don't reassemble it from page references.
+Paths. The precedes chain runs from Sk1 through Sk4 – and on into M 321, the third song, as in the graph of op. 25. You follow a path instead of reassembling it from page references.
 
-Gaps. And here the graph and the commentary disagree. The commentary says that Sk2.1 builds on the rhythm of Sk1 – but there is no edge between them [red dotted line]; in the graph, Sk2.1 hangs on Sk1 only by way of Sk2. And Sk2.1.2 is "presumably" the continuation of Sk2.1.1 – but the statement carries no uncertainty tag, so it counts as certain. Reading the commentary entry by entry, you don't see either. In the graph, a missing line is visible, and a query lists every statement without a tag, to be checked against the text.
+Gaps. Here the graph and the commentary disagree. The commentary says – as we just saw – that Sk2.1 builds on the rhythm of Sk1 – but there is no edge between them yet [red dotted line]; Sk2.1 hangs on Sk1 only by way of Sk2. And Sk2.1.2 is "presumably" the continuation of Sk2.1.1 – but the statement carries no uncertainty tag, so it counts as certain. Reading entry by entry, you see neither. In the graph, a missing relation is visible, and untagged statements can be listed and checked against the commentary.
 
-So the graph does not discover anything by itself. It makes commentary and data comparable. We will come back to such frictions in a moment.
-
-ALT TEXT: Left, a graph of the first sketches of M 317 drawn from the curated data. Top row, linked by precedes arrows: Sk1, Sk2, Sk3, Sk4, M 321 Sk1. Above Sk1 and Sk2, the dating "4. VII. 34", linked to both by dashed lines. Below Sk2, a shaded cluster: Sk2.1 with its variants Sk2.1.1, Sk2.1.2, Sk2.1.3 and Sk2.1.2.1, linked by dashed concomitates lines; caption "one work phase, five entries". Below Sk3, Sk3.1, dashed. In red: an arrow from Sk2.1.1 to Sk2.1.2, labelled "presumably, no tag", and a dotted line with a question mark from Sk1 to Sk2.1, marked in the legend as "in the commentary, not in the graph". Right, a light panel with three points: Clusters – Sk2.1 and its variants, one work phase at a glance; Paths – from Sk1 to Sk4 and on into M 321, the work leaves the song; Gaps – Sk2.1 builds on Sk1, but no edge says so, a "presumably" has no tag. At the bottom of the panel: The graph does not discover. It makes commentary and data comparable.
+So the graph does not discover anything by itself. It makes commentary and data comparable – which brings us to the frictions.
+""",
+        alt="""
+Left, a graph of the first sketches of M 317 drawn from the curated data. Top row, linked by precedes arrows: Sk1, Sk2, Sk3, Sk4, M 321 Sk1. Above Sk1 and Sk2, the dating "4. VII. 34", linked to both by dashed lines. Below Sk2, a shaded cluster: Sk2.1 with its variants Sk2.1.1, Sk2.1.2, Sk2.1.3 and Sk2.1.2.1, linked by dashed concomitates lines; caption "one work phase, five entries". Below Sk3, Sk3.1, dashed. In red: an arrow from Sk2.1.1 to Sk2.1.2, labelled "presumably, no tag", and a dotted line with a question mark from Sk1 to Sk2.1, marked in the legend as "in the commentary, not in the graph". Right, a light panel with three points: Clusters – Sk2.1 and its variants, one work phase at a glance; Paths – from Sk1 to Sk4 and on into M 321, the work leaves the song; Gaps – Sk2.1 builds on Sk1, but no edge says so, a "presumably" has no tag. At the bottom of the panel: The graph does not discover. It makes commentary and data comparable.
 """,
     )
 
 
 def slide_10():
     s = content_slide(
-        "Where claims stay open, the graph pays in queryability",
+        "Where model and data diverge, each gap is information",
         "Frictions: model vs. data",
         watermark=False,
     )
@@ -2206,8 +2230,8 @@ def slide_10():
             "model lags data",
             0.93,
             [
-                ("staves", "free text: “1c–3c”", None),
-                ("measures", "free text: “{1A}, {1B}, 1–2, 3A”", None),
+                ("staves", "own notation: “1c–3c”", None),
+                ("measures", "own notation: “{1A}, {1B}, 1–2, 3A”", None),
                 ("writing instruments", "missing: pencil, ink, crayon", None),
             ],
         ),
@@ -2282,33 +2306,34 @@ def slide_10():
         BAND_TOP,
         32.0,
         BAND_BOTTOM,
-        [("sub", "Each gap is information.")],
+        [("sub", "Some gaps are ours to close; others belong to the evidence.")],
         "Bottom line",
         anchor=MSO_ANCHOR.MIDDLE,
     )
     notes(
         s,
         "Frictions: model vs. data",
-        180,
+        135,
         """
-Where does the model keep claims open – and what does that cost? Building the graph meant reading model and data against each other, and the open places run in both directions.
+These frictions are of another kind than the gaps we just saw: not between commentary and graph, but between model and data. They run in two directions [point to the two columns].
 
-First, where the model has no form for a claim, the claim stays in prose. The source descriptions say on which staves a sketch stands – "1c to 3c", where the letters mark sections within one staff – and which measures it covers, with labels like 1A and 1B for discarded attempts. In the graph these are strings. Nothing is lost for the reader, and nothing is forced into a structure the editors did not intend. But a query cannot see them. Writing instruments – pencil, ink, coloured crayon – are described in the edition, but they are not in the model at all. Yet they are exactly what precedesScripture rests on.
+Where the model lags behind the data, claims stay in prose. The source descriptions record on which staves a sketch stands and which measures it covers – but in their own notation: “1c to 3c”, or labels like 1A and 1B for discarded attempts. The graph carries these as strings, so a query cannot see them; to change that, the model needs terms for parts of a staff and for discarded measures. Writing instruments – pencil, ink, crayon – are not in the model yet either, although precedesScripture rests on them. These gaps we can and will close.
 
-Second, where the data are open themselves, the model has to leave room. The data describe sketchbook 3 twice, as two excerpts, because each edition complex describes only its own pages; the model would want one document. 29 sketches are known only as "Sk##": their number is not yet decided, so their identifiers stay unstable. And some datings have no year, such as "M. am 30. IX." – Webern left it open, and the model cannot store it as a date without inventing one. Where a dating is complete, such as the two datings that frame M 317, the model stores it – but as the date the paratext states, not as the creation date of a sketch. That, too, keeps a claim open.
+Where the data lag behind the model, the decision lies with the editors, not with the model. Sketchbook 3 is described twice, as two excerpts, because each complex describes only its own pages. That needs alignment in the data at some point. 29 sketches are still placeholders, “Sk##”: their number awaits an editorial decision. And some datings have no year – “M. am 30. IX.“. Webern left it open. The model keeps the paratext as it stands, and the year would come in as the editors’ own claim – tagged as uncertain, not stored as fact.
 
-The generator does not close these gaps silently. It has twelve warning rules – placeholder and incompleteDate among them, but also folioConflict, labelConflict and unresolvedReference – and reports every case, complex by complex.
+The generator reports such cases instead of closing them silently: twelve warning rules, placeholder and incompleteDate among them.
 
-So each gap is information. A free-text field shows where an open claim is kept, at the price of queryability. A placeholder shows where an editorial decision is still pending. A warning is not an error to suppress; it marks the places where the graph refuses to claim more than the evidence demands.
-
-ALT TEXT: Two columns joined by a double arrow. Left, "model lags data": staves and measures as free text, writing instruments missing. Right, "data lags model": sketchbooks described per complex, Sk## placeholders (warning: placeholder), incomplete dates (warning: incompleteDate). Bottom line: each gap is information.
+So each gap is information – about the model, or about the evidence. A string shows where the model still lacks terms; a placeholder, where a decision is pending; a warning, where the graph refuses to claim more than the evidence allows.
+""",
+        alt="""
+Two columns joined by a double arrow. Left, "model lags data": staves and measures in their own notation, stored as strings, writing instruments missing. Right, "data lags model": sketchbooks described per complex, Sk## placeholders (warning: placeholder), incomplete dates (warning: incompleteDate). Bottom line: some gaps are ours to close; others belong to the evidence.
 """,
     )
 
 
 def slide_11():
     s = content_slide(
-        "Standards serve as alignments, not as the model",
+        "For now, the model is domain-specific, with links to standards",
         "Standards and alignments",
         watermark=False,
     )
@@ -2330,10 +2355,10 @@ def slide_11():
         ),
         (
             [("bold", "Dublin Core terms, SKOS, PROV, "), ("code", "rdf:Statement")],
-            "reused outright: parts, concept schemes, attribution, statements",
+            "single terms: parts, concept schemes, attribution, statements",
             "used directly",
         ),
-        ("MEI", "not integrated yet", "–"),
+        ("MEI", "not integrated yet 😢", "–"),
     ]
     # Vorlage p. 11: the dark band on top carries the slide's key statement.
     band(s, 4.2, 1.8, "Band: key statement", dark=True)
@@ -2347,7 +2372,7 @@ def slide_11():
             [
                 (
                     "band_bold",
-                    "A sketch's genetic place rests on content and material traces together",
+                    "Relating sketches draws on content and page together",
                 ),
                 ("band_body", " – which LRMoo separates (F2 Expression vs. F5 Item)."),
             ]
@@ -2392,21 +2417,14 @@ def slide_11():
     notes(
         s,
         "Standards and alignments",
-        180,
+        75,
         """
-How does this relate to standards? In short: standards serve as alignments, not as the model.
+How does this relate to standards? For now, the model is domain-specific: built for Webern’s sources and the AWG’s needs. Where existing models offer related concepts, we point to them – LRMoo for work, expression and item, CIDOC CRM for the temporal reading of the two relations you just saw. The connections to those standards are links, rdfs:seeAlso, not subclasses: a subclass would commit us to all the semantics the standard implies which do not always fit. Where single terms fit exactly, we use them directly: from Dublin Core for parts and wholes, from SKOS for concept schemes, from PROV for attribution. MEI is not integrated yet.
 
-LRMoo, the successor of FRBRoo, offers the obvious mapping. An edition complex is close to F1 Work, a version and a sketch to F2 Expression, a document to F5 Item. CIDOC CRM gives the temporal reading of our two relations: precedes corresponds to P176, "starts before the start of", concomitates to P174, "starts before the end of" – strictly speaking between the creation events, not between the sketches themselves.
-
-All of these links are rdfs:seeAlso, not subClassOf. They say: here is a related concept. They do not let a reasoner conclude anything. That is a deliberate choice for version 0.1. A subclass claim would commit us to everything the standard implies: if a Sketch were an F2 Expression, every inference about expressions would apply to it – including the cut between expression and item that I come to in a moment. And because the CRM relations hold between temporal entities, the ontology points to F28 Expression Creation as the event behind both of our relations.
-
-Other vocabularies we reuse outright, because their meaning fits exactly: Dublin Core terms for parts and wholes; SKOS for our concept schemes – paratext types, certainty, catalogue types; PROV for attributing editorial statements to editors; and rdf:Statement as the superclass of these statements. For the statements themselves, CRMinf would be the natural partner: an editorial statement is close to I2 Belief, the argumentation behind it to I1. That, too, is noted as seeAlso.
-
-MEI is not integrated. Our edited music texts are SVG sheets, not MEI encodings; linking graph nodes to MEI elements is a later step.
-
-And here – the statement at the top of the slide – is where the standard does not fit. LRMoo separates content and object: the expression on the one hand, the item that carries it on the other. For a printed edition that is a clean cut. For a sketch it is not. Its genetic place is argued from both at once: from what it contains – a rhythm taken up, a note changed in two places – and from where and how it stands on the page – the space it takes, what it overwrites, pencil or ink. You will see both shortly, on one sketchbook page. Split the sketch into F2 and F5, and you split the argument. So the AWG keeps Sketch as one class and only points to LRMoo.
-
-ALT TEXT: At the top, in a dark teal band: a sketch's genetic place rests on content and material traces together, which LRMoo separates (F2 Expression vs. F5 Item). Below, a table with three columns – standard, in the AWG model, link. LRMoo: edition complex about F1 Work, version and sketch about F2 Expression, document about F5 Item (rdfs:seeAlso). CIDOC CRM: temporal reading, precedes about P176, concomitates about P174 (rdfs:seeAlso). Dublin Core terms, SKOS, PROV, rdf:Statement: reused outright (used directly). MEI: not integrated.
+One example shows why we keep the distance for now. LRMoo separates content and object, the expression and the item that carries it. For a sketch, that cut runs right through the argument: relating sketches draws on what they contain and on how they stand on the page – both at once, as you will see shortly.
+""",
+        alt="""
+At the top, in a dark teal band: relating sketches draws on content and page together, which LRMoo separates (F2 Expression vs. F5 Item). Below, a table with three columns – standard, in the AWG model, link. LRMoo: edition complex about F1 Work, version and sketch about F2 Expression, document about F5 Item (rdfs:seeAlso). CIDOC CRM: temporal reading, precedes about P176, concomitates about P174 (rdfs:seeAlso). Dublin Core terms, SKOS, PROV, rdf:Statement: single terms (used directly). MEI: not integrated.
 """,
     )
 
@@ -2437,7 +2455,7 @@ def slide_12():
     set_alpha(band_panel._element.spPr, 50)
     statements = [
         [("statement", "Layers show where editorial judgment becomes explicit.")],
-        [("statement", "Warnings show where the data disagree.")],
+        [("statement", "Warnings show where the data are open or disagree.")],
         [
             ("statement", "Model and data are written side by side: "),
             ("statement_term", "concomitant"),
@@ -2476,19 +2494,20 @@ def slide_12():
     notes(
         s,
         "Conclusion and outlook",
-        135,
+        115,
         """
-Back to the opening question: can the graph keep claims as open as the evidence demands? Partly. The model has means for openness: concomitates instead of an invented order, plain precedes where the evidence is not specified, a certainty tag on a statement. Where it has none, openness survives as free text and gaps – readable, but not queryable. And where the generator reads numbering as process, it closes more than the editors claimed. Three conclusions follow.
+Back to the opening question: can the graph keep open what cannot be decided, and yet hold it in a formal model? Partly. The model has means for openness: concomitates instead of an invented order, plain precedes where the evidence is not specified, an uncertainty tag on a statement. Where it has none yet, openness survives as strings and gaps – readable, but not queryable. And where the generator reads numbering as process, it closes more than the editors claimed. Three conclusions follow.
 
 First: layers show where editorial judgment becomes explicit. The generated layer already rests on editorial decisions – the numbering, the source descriptions – but leaves them implicit; the curated layer states what editors assert. In op. 25, the difference is the chain across the songs: the editors' argument, made visible.
 
-Second: warnings show where the data disagree. The generator does not silently repair the data. Every placeholder, every incomplete date, every conflict between folio and label is reported.
+Second: warnings show where the data are open or disagree. The generator reports instead of silently repairing.
 
-Third: model and data are written side by side – concomitant, in the sense of our own relation. Neither came first. The model was revised wherever the data resisted, and the data will be revised wherever the model shows gaps. Their relation is not an order, but mutual influence. In that sense, "compositional processes as graph" also means: the graph itself is in process.
+Third: model and data are written side by side – concomitant, in the sense of our own relation. The model was revised wherever the data resisted, and the data will be revised wherever the model shows gaps. In that sense, “compositional processes as graph“ also means: the graph itself is in process.
 
-Next steps: the editorial statements will move into named graphs, so that, for example, the ink and pencil layers of a sketch can be kept apart. Today about 116 curated edges are reified as statements; then statement nodes remain only where uncertainty or a justification needs them. And persons and archives, so far only open questions, will become part of the model.
-
-ALT TEXT: Left, a pale teal detail of the op. 25 graph with node labels. Right, a mint panel with three conclusions: layers show where editorial judgment becomes explicit; warnings show where the data disagree; model and data are written side by side – concomitant. Below: next steps, named graphs for ink and pencil layers, persons, archives.
+Next steps: the editorial statements will move into named graphs, so that, for example, the ink and pencil layers of a sketch can be kept apart – one of the gaps we saw. And persons and archives, so far only open questions, will become part of the model.
+""",
+        alt="""
+Left, a pale teal detail of the op. 25 graph with node labels. Right, a mint panel with three conclusions: layers show where editorial judgment becomes explicit; warnings show where the data are open or disagree; model and data are written side by side – concomitant. Below: next steps, named graphs for ink and pencil layers, persons, archives.
 """,
     )
 
@@ -2523,7 +2542,7 @@ def slide_13():
         [
             (
                 "closing_light",
-                "Whose genetic order does the graph show – Webern's or ours?",
+                "Whose process does the graph show – Webern's or ours?"  # break after the dash,
             )
         ],
         "Question",
@@ -2537,7 +2556,7 @@ def slide_13():
         [
             (
                 "closing_sub_light",
-                "How much of Webern's compositional process survives translation "
+                "How much of (Webern's) compositional processes survives translation "
                 "into formal models?",
             )
         ],
@@ -2560,15 +2579,16 @@ def slide_13():
         """
 I would like to end with a question rather than a result.
 
-If model and data shape each other – if they are, in our own term, concomitant – then the graph is not simply Webern's process, read off the documents. It is also our construction: our numbering, our evidence types, our decisions about what counts as a relation. So: whose genetic order does the graph show – Webern's, or ours?
+If model and data shape each other – if they are, in our own term, concomitant – then the graph does not simply reflect Webern's compositional processes, read off the documents. It is also our construction: our numbering, our evidence types, our decisions about what counts as a relation. So: whose process does the graph show – Webern's, or ours?
 
-The second question looks outward. A sketch whose page is its argument is exactly what a formal model tends to split. So: how much of Webern's compositional process survives translation into formal models?
+The second question looks outward. Every formal model is a kind of translation. We have seen it in this talk: editorial terms into classes, observations into edges etc. Each step keeps something, and loses something. So: how much of (Webern’s) compositional processes survives translation into formal models?
 
 I look forward to your answers – and to your material. Thank you.
 
-STAGE: Stay on this slide during the discussion; go to the next slide (contact) only at the very end.
-
-ALT TEXT: Behind the slide, a pale image of another region of the full op. 25 graph. In a dark teal band, in white: whose genetic order does the graph show – Webern's or ours? Below, smaller: how much of Webern's compositional process survives translation into formal models?
+[Stage: stay on this slide during the discussion; go to the next slide (contact) only at the very end.]
+""",
+        alt="""
+Behind the slide, a pale image of another region of the full op. 25 graph. In a dark teal band, in white: whose process does the graph show – Webern's or ours? Below, smaller: how much of (Webern's) compositional processes survives translation into formal models?
 """,
     )
 
@@ -2605,7 +2625,7 @@ def slide_14():
         "Contact",
         0,
         """
-STAGE: Show only after the discussion (or when the chair closes the session); no spoken text. The closing question (previous slide) stays up during the Q&A.
+[Stage: show only after the discussion, or when the chair closes the session; no spoken text. The closing question (previous slide) stays up during the Q&A.]
 """,
     )
 
