@@ -1297,7 +1297,7 @@ def slide_02_editions():
         """
 But first, a word on the edition project itself. The Anton Webern Gesamtausgabe is a historical-critical complete edition of Anton Webern's compositions, in print and online. It distinguishes three forms of edition, depending on how the sources have come down to us and on the intended usage: work, text and sketch editions.
 
-Work editions present the versions published in Webern's lifetime or intended for publication: op. 1 to 31, and his arrangements of other composers' works. Text editions present versions that go beyond a sketch but were not concluded in print: study compositions, fragments, earlier versions of published works. Both edit a version of the musical text – in German, a "Textfassung". A version is not a document: it is a state of the musical text, attested by one or more sources.
+Work editions present the compositions published in Webern's lifetime or intended for publication: op. 1 to 31, and his arrangements of other composers' works. Text editions present versions that go beyond a sketch but were not concluded in print: study compositions, fragments, earlier versions of published works. Both edit a version of the musical text – in German, a "Textfassung". A version is not a document: it is a state of the musical text, attested by one or more sources.
 
 Sketch editions edit Webern's sketches – mostly in pencil, and most often, but not always, connected to a Textfassung.
 
@@ -1389,7 +1389,7 @@ A second example, from the beginnings of our work with the idea of graphs: a ske
 
 Webern had not settled the scoring: He starts for four voices [top band], tries out row variants [left], changes to three voices [middle], and ends with voice and piano [bottom right]. He keeps reordering – and in the end he abandons the piece.
 
-On paper, these sketches are spread over three pages, and their order is anything but obvious – even if you took the numbering as chronological order, it would not tell you which sketch belongs to which scoring. As a graph, the process becomes something you can place: you see which sketch leads where, across the changes of scoring, and where the order stays open.
+On paper, these sketches are spread over three pages, and their order is anything but obvious – even if you took the numbering as chronological order, it would not tell you which sketch belongs to which scoring. Put as a graph, the process becomes something you can place: you see which sketch leads where, across the changes of scoring, and where the order stays open.
 
 For our editors, that was the point of drawing it: it made a process we could not yet describe in words graspable – and it showed us what a model would have to hold.
 """,
@@ -2208,7 +2208,7 @@ Clusters. Sk2.1 and its variants all concomitate – with Sk2.1, and through it 
 
 Paths. The precedes chain runs from Sk1 through Sk4 – and on into M 321, the third song, as in the graph of op. 25. You follow a path instead of reassembling it from page references.
 
-Gaps. Here the graph and the commentary disagree. The commentary says – as we just saw – that Sk2.1 builds on the rhythm of Sk1 – but there is no edge between them yet [red dotted line]; Sk2.1 hangs on Sk1 only by way of Sk2. And Sk2.1.2 is "presumably" the continuation of Sk2.1.1 – but the statement carries no uncertainty tag, so it counts as certain. Reading entry by entry, you see neither. In the graph, a missing relation is visible, and untagged statements can be listed and checked against the commentary.
+Gaps. Here the graph and the commentary disagree. The commentary says – as we just saw – that Sk2.1 builds on the rhythm of Sk1 – but there is no edge between them yet [red dotted line]; Sk2.1 hangs on Sk1 only by way of Sk2. And Sk2.1.2 is "presumably" the continuation of Sk2.1.1 – but the statement carries no uncertainty tag, so it counts as certain. Reading entry by entry, you see neither. In the graph, a missing relation becomes visible, and untagged statements can be listed and checked against the commentary.
 
 So the graph does not discover anything by itself. It makes commentary and data comparable – which brings us to the frictions.
 """,
