@@ -93,7 +93,7 @@ In the source descriptions, these terms are used as editors use them: flexibly, 
 
 The first question was: what do a sketch and a paratext have in common? Both are written on a page, and both have a place in the compositional process – a title or a dating is written at some point, too. So the superclass is Inscription: everything written on a document that we can place in that process. Sketch and Paratext are its subclasses. Under Sketch, there are two more specific classes: the row table and the continuity draft.
 
-Uncertainty is not a relation of its own. An earlier draft had a relation "concomitates unsure". Now an editorial statement carries an uncertainty tag: certainty, uncertain. Without the tag, the statement counts as certain.
+Uncertainty is not a relation of its own. An editorial statement carries an uncertainty tag: certainty, uncertain. Without the tag, the statement counts as certain.
 
 Some terms of the edition have no class yet like "study composition" and "ink draft", but we are in the process of including them.
 
@@ -103,11 +103,11 @@ Some terms of the edition have no class yet like "study composition" and "ink dr
 
 Inscriptions placed in the process need relations between them. The model has two – precedes and concomitates.
 
-"precedes" marks a temporal order that the evidence supports: A was started before B. It says nothing about the end – overlap is allowed, because Webern often went back to an earlier sketch while working on a later one. The relation is transitive. (Cf. CIDOC CRM's P176 "starts before the start of")
+"precedes" marks a temporal order that the evidence supports: A was started before B. It says nothing about the end – overlap is allowed, because Webern often went back to an earlier sketch while working on a later one. The relation is transitive: if A precedes B and B precedes C, A precedes C, so the graph can follow chains. (Cf. CIDOC CRM's P176 "starts before the start of")
 
-"concomitates" is a different kind of statement. A and B were written alongside each other, and each shaped the other: a change in one is taken up in the other. Which came first cannot be decided – so the relation records the influence instead of marking an order. It implies overlap in time; it is symmetric, and not transitive. (Cf. CIDOC CRM's P174 "starts before the end of")
+"concomitates" is a different kind of statement. A and B were written alongside each other, and each shaped the other: a change in one is taken up in the other. Which came first cannot be decided – so the relation records the influence instead of marking an order. It implies overlap in time; it is symmetric, and not transitive: A alongside B, B alongside C does not put A alongside C. (Cf. CIDOC CRM's P174 "starts before the end of")
 
-For precedes, the model can also record the kind of evidence. precedesScripture rests on the writing: position on the page, overlay, writing instruments, layers of correction. precedesContent rests on the musical content: the later inscription takes over changes made in the earlier one. In op. 25, the editors assert precedesScripture between Sketches 1 and 2 of M 317 – you will see it on the page – and precedesContent between Sketches 2 and 3. Plain precedes leaves the evidence open.
+For precedes, the model can also record the kind of evidence. precedesScripture rests on the writing: position on the page, overlay, writing instruments, layers of correction. precedesContent rests on the musical content: the later inscription takes over changes made in the earlier one. The plain precedes leaves the evidence open.
 
 
 ## Slide 11 – For now, the model is domain-specific, with links to standards / Standards and alignments
@@ -152,7 +152,7 @@ Here are the top three systems in the AWG's diplomatic transcription. Normally, 
 
 [Point to Sk2.1.] On the right, Sk2.1 turns the row of Sk2, in the rhythm of Sk1, into a melody with text. The commentary says that row B of Sk2 was written "in dynamic alignment" with Sk2.1 and its variants. You can see it in one note [green marks]: in bar 2 of Sk2.1, Webern brackets the g – a sign for its deletion – and goes on with f sharp; in row B, he writes f sharp over the g – the grey note is the overwritten one. The same decision, in both places. Each shaped the other; it cannot be decided which came first. In the model, that is concomitates.
 
-So one page holds both: an order inferred from the writing, and an exchange that no order captures. Even the dating, 4 July 1934, is modelled this way: it concomitates with Sk1 and with Sk2, because the editors cannot say with which of the two it was written.
+So one page holds both: an order inferred from the writing, and an exchange that no order captures.
 
 ## Slide 15 – A process Webern kept reordering, and then dropped, becomes graspable / Exploring the graph: M 307
 
@@ -172,7 +172,7 @@ For our editors, that was the point of drawing it: it made a process we could no
 
 What does the graph add to the critical commentary? Not new facts – everything here was asserted by the editors. But it shows them differently. Three things, back on the first sketches of M 317.
 
-Clusters. Sk2.1 and its variants all concomitate – with Sk2.1, and through it with Sk2. In the commentary, that is five separate entries, each saying "in dynamic alignment with". In the graph it is one cluster [point to the shaded area]: a compositional work phase at a glance.
+Clusters. Sk2.1 and its variants all concomitate – with Sk2.1, which in turn concomitates with Sk2. In the commentary, that is five separate entries, each saying "in dynamic alignment with". In the graph it is one cluster [point to the shaded area]: a compositional work phase at a glance.
 
 Paths. The precedes chain runs from Sk1 through Sk4 – and on into M 321, the third song, as in the graph of op. 25. You follow a path instead of reassembling it from page references.
 
@@ -222,7 +222,7 @@ I look forward to your answers – and to your material. Thank you.
 
 [Stage: stay on this slide during the discussion; go to the next slide (contact) only at the very end.]
 
-## Slide 20 – Thank you / Contact
+## Slide 20 – Thank you! / Contact
 
 [Contact] Target time: 0:00 (cumulative 25:00 of 25:00)
 

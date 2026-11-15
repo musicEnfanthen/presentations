@@ -1,4 +1,4 @@
-"""Build the two-page handout AWG-Graph-Handout-v2.docx (+ PDF) for the genetics2026 talk.
+"""Build the two-page handout AWG-Graph-Handout-v3.docx (+ PDF) for the genetics2026 talk.
 
 The handout follows the order of the slides and carries the reference detail
 the slides only speak: the forms of edition, terms and classes, relation
@@ -29,7 +29,7 @@ from PIL import Image, ImageDraw, ImageFont
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 TEMPLATE = os.path.join(HERE, "handout-template.docx")
-OUT = os.path.join(os.path.dirname(HERE), "AWG-Graph-Handout-v2.docx")
+OUT = os.path.join(os.path.dirname(HERE), "AWG-Graph-Handout-v3.docx")
 
 EMAIL = "stefan.muennich@unibas.ch"
 URL = "https://edition.anton-webern.ch"
@@ -420,7 +420,7 @@ def content():
     B.append(heading("8  What the graph shows"))
     B.append(grey_columns([
         ("→ Clusters", "Sk2.1 and its variants: one work phase at a glance"),
-        ("→ Paths", "Sk1 → Sk4 → M 321: the work leaves the song"),
+        ("→ Paths", "Sk1 → Sk4 → M 321: the process crosses song boundaries"),
         ("→ Gaps", "a “presumably” without a tag counts as certain"),
     ]))
 

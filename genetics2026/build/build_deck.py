@@ -1190,7 +1190,7 @@ In the source descriptions, these terms are used as editors use them: flexibly, 
 
 The first question was: what do a sketch and a paratext have in common? Both are written on a page, and both have a place in the compositional process – a title or a dating is written at some point, too. So the superclass is Inscription: everything written on a document that we can place in that process. Sketch and Paratext are its subclasses. Under Sketch, there are two more specific classes: the row table and the continuity draft.
 
-Uncertainty is not a relation of its own. An earlier draft had a relation "concomitates unsure". Now an editorial statement carries an uncertainty tag: certainty, uncertain. Without the tag, the statement counts as certain.
+Uncertainty is not a relation of its own. An editorial statement carries an uncertainty tag: certainty, uncertain. Without the tag, the statement counts as certain.
 
 Some terms of the edition have no class yet like "study composition" and "ink draft", but we are in the process of including them.
 """,
@@ -1555,11 +1555,11 @@ def slide_07():
         """
 Inscriptions placed in the process need relations between them. The model has two – precedes and concomitates.
 
-"precedes" marks a temporal order that the evidence supports: A was started before B. It says nothing about the end – overlap is allowed, because Webern often went back to an earlier sketch while working on a later one. The relation is transitive. (Cf. CIDOC CRM's P176 "starts before the start of")
+"precedes" marks a temporal order that the evidence supports: A was started before B. It says nothing about the end – overlap is allowed, because Webern often went back to an earlier sketch while working on a later one. The relation is transitive: if A precedes B and B precedes C, A precedes C, so the graph can follow chains. (Cf. CIDOC CRM's P176 "starts before the start of")
 
-"concomitates" is a different kind of statement. A and B were written alongside each other, and each shaped the other: a change in one is taken up in the other. Which came first cannot be decided – so the relation records the influence instead of marking an order. It implies overlap in time; it is symmetric, and not transitive. (Cf. CIDOC CRM's P174 "starts before the end of")
+"concomitates" is a different kind of statement. A and B were written alongside each other, and each shaped the other: a change in one is taken up in the other. Which came first cannot be decided – so the relation records the influence instead of marking an order. It implies overlap in time; it is symmetric, and not transitive: A alongside B, B alongside C does not put A alongside C. (Cf. CIDOC CRM's P174 "starts before the end of")
 
-For precedes, the model can also record the kind of evidence. precedesScripture rests on the writing: position on the page, overlay, writing instruments, layers of correction. precedesContent rests on the musical content: the later inscription takes over changes made in the earlier one. In op. 25, the editors assert precedesScripture between Sketches 1 and 2 of M 317 – you will see it on the page – and precedesContent between Sketches 2 and 3. Plain precedes leaves the evidence open.
+For precedes, the model can also record the kind of evidence. precedesScripture rests on the writing: position on the page, overlay, writing instruments, layers of correction. precedesContent rests on the musical content: the later inscription takes over changes made in the earlier one. The plain precedes leaves the evidence open.
 """,
         alt="""
 Two timeline panels. Left, "precedes": bar A starts before bar B, the bars overlap; red dashed lines mark the two starts. Right, "concomitates": bar A lies within bar B, a red frame marks the overlap and a vertical red double arrow between the bars, labelled "mutual influence", shows that each shapes the other. Captions: precedes – an order can be shown, A begins before B, overlap allowed; concomitates – A and B influence each other, which came first cannot be decided. CRM analogies: P176, and P174 (the overlap, not the influence). Below, two labels: precedesScripture (page, overlay, writing instruments) and precedesContent (musical content).
@@ -1860,7 +1860,7 @@ Here are the top three systems in the AWG's diplomatic transcription. Normally, 
 
 [Point to Sk2.1.] On the right, Sk2.1 turns the row of Sk2, in the rhythm of Sk1, into a melody with text. The commentary says that row B of Sk2 was written "in dynamic alignment" with Sk2.1 and its variants. You can see it in one note [green marks]: in bar 2 of Sk2.1, Webern brackets the g – a sign for its deletion – and goes on with f sharp; in row B, he writes f sharp over the g – the grey note is the overwritten one. The same decision, in both places. Each shaped the other; it cannot be decided which came first. In the model, that is concomitates.
 
-So one page holds both: an order inferred from the writing, and an exchange that no order captures. Even the dating, 4 July 1934, is modelled this way: it concomitates with Sk1 and with Sk2, because the editors cannot say with which of the two it was written.
+So one page holds both: an order inferred from the writing, and an exchange that no order captures.
 """,
         alt="""
 The diplomatic transcription of M 317, folio 38v, systems 1 to 3, across the slide. Labels above system 1 mark three sketches from left to right: Sk2, Sk1, Sk2.1. An arrow labelled precedesScripture points from Sk1 to Sk2, that is, from right to left. A red rectangle marks the crowded right end of Sk2. Two green rectangles mark where g gives way to f sharp: in row B of Sk2 (f sharp written over a grey g) and in bar 2 of Sk2.1 (g struck out, followed by f sharp). Below the excerpt, a dashed line labelled concomitates connects Sk2.1 and Sk2. Two text blocks: Sk1 precedesScripture Sk2 – the right end of Sk2 is squeezed together, Sk1 already took the space, an order inferred from the writing; Sk2.1 concomitates Sk2 – in both, g gives way to f sharp (green), Sk2.1 and row B of Sk2 shape each other, which came first cannot be decided.
@@ -2156,7 +2156,7 @@ def slide_09_explore():
         ),
         (
             "Paths",
-            "From Sk1 to Sk4 and on into M 321: the work leaves the song.",
+            "From Sk1 to Sk4 and on into M 321: the process crosses song boundaries.",
         ),
         (
             "Gaps",
@@ -2204,7 +2204,7 @@ def slide_09_explore():
         """
 What does the graph add to the critical commentary? Not new facts – everything here was asserted by the editors. But it shows them differently. Three things, back on the first sketches of M 317.
 
-Clusters. Sk2.1 and its variants all concomitate – with Sk2.1, and through it with Sk2. In the commentary, that is five separate entries, each saying "in dynamic alignment with". In the graph it is one cluster [point to the shaded area]: a compositional work phase at a glance.
+Clusters. Sk2.1 and its variants all concomitate – with Sk2.1, which in turn concomitates with Sk2. In the commentary, that is five separate entries, each saying "in dynamic alignment with". In the graph it is one cluster [point to the shaded area]: a compositional work phase at a glance.
 
 Paths. The precedes chain runs from Sk1 through Sk4 – and on into M 321, the third song, as in the graph of op. 25. You follow a path instead of reassembling it from page references.
 
@@ -2213,7 +2213,7 @@ Gaps. Here the graph and the commentary disagree. The commentary says – as we 
 So the graph does not discover anything by itself. It makes commentary and data comparable – which brings us to the frictions.
 """,
         alt="""
-Left, a graph of the first sketches of M 317 drawn from the curated data. Top row, linked by precedes arrows: Sk1, Sk2, Sk3, Sk4, M 321 Sk1. Above Sk1 and Sk2, the dating "4. VII. 34", linked to both by dashed lines. Below Sk2, a shaded cluster: Sk2.1 with its variants Sk2.1.1, Sk2.1.2, Sk2.1.3 and Sk2.1.2.1, linked by dashed concomitates lines; caption "one work phase, five entries". Below Sk3, Sk3.1, dashed. In red: an arrow from Sk2.1.1 to Sk2.1.2, labelled "presumably, no tag", and a dotted line with a question mark from Sk1 to Sk2.1, marked in the legend as "in the commentary, not in the graph". Right, a light panel with three points: Clusters – Sk2.1 and its variants, one work phase at a glance; Paths – from Sk1 to Sk4 and on into M 321, the work leaves the song; Gaps – Sk2.1 builds on Sk1, but no edge says so, a "presumably" has no tag. At the bottom of the panel: The graph does not discover. It makes commentary and data comparable.
+Left, a graph of the first sketches of M 317 drawn from the curated data. Top row, linked by precedes arrows: Sk1, Sk2, Sk3, Sk4, M 321 Sk1. Above Sk1 and Sk2, the dating "4. VII. 34", linked to both by dashed lines. Below Sk2, a shaded cluster: Sk2.1 with its variants Sk2.1.1, Sk2.1.2, Sk2.1.3 and Sk2.1.2.1, linked by dashed concomitates lines; caption "one work phase, five entries". Below Sk3, Sk3.1, dashed. In red: an arrow from Sk2.1.1 to Sk2.1.2, labelled "presumably, no tag", and a dotted line with a question mark from Sk1 to Sk2.1, marked in the legend as "in the commentary, not in the graph". Right, a light panel with three points: Clusters – Sk2.1 and its variants, one work phase at a glance; Paths – from Sk1 to Sk4 and on into M 321, the process crosses song boundaries; Gaps – Sk2.1 builds on Sk1, but no edge says so, a "presumably" has no tag. At the bottom of the panel: The graph does not discover. It makes commentary and data comparable.
 """,
     )
 
@@ -2542,7 +2542,7 @@ def slide_13():
         [
             (
                 "closing_light",
-                "Whose process does the graph show – Webern's or ours?"  # break after the dash,
+                "Whose process does the graph show – Webern's or ours?",  # break after the dash,
             )
         ],
         "Question",
@@ -2597,11 +2597,14 @@ def slide_14():
     s = prs.slides.add_slide(LAYOUT_TITLE)
     for t in ("ctrTitle", "subTitle"):
         remove_ph(s, t)
-    add_text(s, 2.33, 3.6, 21.5, 1.6, [("closing", "Thank you")], "Thank you")
+    dy = 1.5  # whole block lower on the slide
+    add_text(
+        s, 2.33, 3.6 + dy, 21.5, 1.6, [("closing", "Thank you very much!")], "Thank you"
+    )
     add_text(
         s,
         2.33,
-        6.0,
+        6.0 + dy,
         21.5,
         0.8,
         [("sub", f"{SPEAKER} · Anton Webern Gesamtausgabe, University of Basel")],
@@ -2610,7 +2613,7 @@ def slide_14():
     contact = add_text(
         s,
         2.33,
-        7.2,
+        7.2 + dy,
         21.5,
         1.6,
         [("body", EMAIL), ("body", EDITION_URL.removeprefix("https://"))],
@@ -2619,6 +2622,25 @@ def slide_14():
     runs = list(contact._element.iter(qn("a:r")))
     link_run(s, runs[0], f"mailto:{EMAIL}")
     link_run(s, runs[1], EDITION_URL)
+    # AI disclosure in the white area below the mint band (Uni Basel guidelines, v1.5)
+    add_text(
+        s,
+        2.33,
+        15.4,
+        30.6,
+        1.6,
+        [
+            (
+                "caption",
+                "AI use: Claude (Anthropic, Opus 5.5) assisted with build scripts for the layout of the slide deck and handout, "
+                "language editing and software development for the AWG online edition, including the graph pipeline. "
+                "Research questions and content, modelling decisions and editorial findings are human work (author and AWG team); all AI output "
+                "was checked by the author, who remains responsible. Following the University of Basel "
+                "guidelines on AI in research (v1.5, 2025).",
+            )
+        ],
+        "AI use",
+    )
     add_watermark(s, 25.0, 3.0, 0.7, WHITE, 55, 65)
     notes(
         s,
